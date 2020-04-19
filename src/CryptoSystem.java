@@ -1,6 +1,7 @@
 import java.awt.BorderLayout;
 import java.io.*;
 import java.net.ConnectException;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.awt.EventQueue;
 
@@ -30,6 +31,27 @@ public class CryptoSystem extends JFrame{
 					
 				} catch (Exception e) {
 					e.printStackTrace();
+				}
+				int portNum = 5520;
+				try {
+					PrintWriter pw = new PrintWriter(new FileWriter("prog1b.log"), true);
+					ServerSocket sock = new ServerSocket(portNum);
+					while (true) {
+						try {
+							Socket sockNew = sock.accept();
+							ServerThread st = new ServerThread(sockNew);
+							st.start();
+							if (!st.isAlive())
+								pw.close();
+						} catch (Exception e) {
+							pw.println("Error: " + e);
+							pw.flush();
+							System.out.println("error: " + e);
+						}
+					}
+				}
+				catch (Exception e){
+					System.out.println("Error 2: " + e);
 				}
 			}
 		});
