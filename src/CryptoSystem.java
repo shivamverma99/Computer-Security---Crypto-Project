@@ -21,10 +21,15 @@ import javax.swing.JTextArea;
 public class CryptoSystem extends JFrame{
 	
 	private JPanel contentPane;
+	static ServerThread[] clients = new ServerThread[10];
+	static int threadCounter = 0;
+	static String[] threadNameType = new String[10];
+	static int nameCounter = 0;
 	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
+				
 				try {
 					CryptoSystem frame = new CryptoSystem();
 					frame.setVisible(true);
@@ -34,18 +39,37 @@ public class CryptoSystem extends JFrame{
 				}
 				int portNum = 5520;
 				try {
-					PrintWriter pw = new PrintWriter(new FileWriter("prog1b.log"), true);
 					ServerSocket sock = new ServerSocket(portNum);
+					String[] dest;
+					String message;
+					String sender;
 					while (true) {
 						try {
 							Socket sockNew = sock.accept();
-							ServerThread st = new ServerThread(sockNew);
-							st.start();
-							if (!st.isAlive())
-								pw.close();
+							if (threadCounter == 10) {
+								System.out.println("Too many members in chat");
+							}
+							else {
+								clients[threadCounter] = new ServerThread(sockNew);
+								clients[threadCounter].start();
+								threadNameType[threadCounter] = clients[threadCounter].userNameAndType;
+								threadCounter++;
+							}
+							for (int i = 0; i < threadCounter; i++) {
+								if (clients[threadCounter].alert) {
+									message = clients[threadCounter].message;
+									dest = clients[threadCounter].destinations;
+									sender = clients[threadCounter].name;
+									for (int j = 0; j < dest.length; j++) {
+										for (int k = 0; k < threadNameType.length; k++) {
+											if (threadNameType[k].contains(dest[j])) {
+												clients[k].setIncomingMessage(message, sender);
+											}
+										}
+									}
+								}
+							}
 						} catch (Exception e) {
-							pw.println("Error: " + e);
-							pw.flush();
 							System.out.println("error: " + e);
 						}
 					}
@@ -80,7 +104,9 @@ public class CryptoSystem extends JFrame{
 		
 		JTextArea txtChatMembers = new JTextArea();
 		txtChatMembers.setEditable(false);
-		
+		for (int i = 0; i < threadCounter; i++) {
+			txtChatMembers.append(threadNameType[i]);
+		}
 		JLabel lblChatMessages = new JLabel("Chat Messages");
 		
 		JTextArea txtChat = new JTextArea();
