@@ -1,4 +1,5 @@
 
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Scanner;
@@ -10,6 +11,15 @@ public class Attacker {
 	 * @return
 	 */
 	public static String ciphertextOnly() {
+		try {
+			InetAddress inetAddress = InetAddress.getLocalHost();
+			String IP = inetAddress.getHostAddress();
+			Client client = new Client(IP, 1234); 
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		String ciphertext = "";
 		return ciphertext;
 	}
@@ -20,6 +30,15 @@ public class Attacker {
 	 * @return pair
 	 */
 	public static String[] knownPlaintext() {
+		try {
+			InetAddress inetAddress = InetAddress.getLocalHost();
+			String IP = inetAddress.getHostAddress();
+			Client client = new Client(IP, 1234); 
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		
 		String cipher ="";
 		String plaintext = "";
 		String[] pair = new String[2];
@@ -34,6 +53,15 @@ public class Attacker {
 	 * @return plaintext
 	 */
 	public static String chosenCiphertext(String cipher) {
+		try {
+			InetAddress inetAddress = InetAddress.getLocalHost();
+			String IP = inetAddress.getHostAddress();
+			Client client = new Client(IP, 1234); 
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		
 		String plaintext = "";
 		return plaintext;
 	}
@@ -45,20 +73,20 @@ public class Attacker {
 	 *
 	 */
 	public static String chosenPlaintext(String plaintext) {
+		try {
+			InetAddress inetAddress = InetAddress.getLocalHost();
+			String IP = inetAddress.getHostAddress();
+			Client client = new Client(IP, 1234); 
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		
 		String cipher ="";
 		return cipher;
 	}
 	
 	public static void main(String[] args) {
-		
-		try {
-			InetAddress inetAddress = InetAddress.getLocalHost();
-			String IP = inetAddress.getHostAddress();
-			Client client = new Client(IP, 5000); 
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
 		
 		String s = "";
 		while (!s.equals("quit")) {
