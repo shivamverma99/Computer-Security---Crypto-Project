@@ -68,16 +68,17 @@ public class Attacker {
 			s = in.nextLine();
 		
 			if (s.equals("1")) {
-			
+				//Ask server for array of cipher-texts
 			}
 			else if (s.equals("2")) {
-			
+				//Ask server for array of cipher-text and plain-text pairs
 			}
 			else if (s.equals("3")) {
+				//Input plain-text, and get back cipher-text
 	
 			}
 			else if (s.equals("4")) {
-	
+				//Input cipher-text, and get back plain-text
 			}
 		
 		}
