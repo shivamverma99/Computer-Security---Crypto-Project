@@ -3,12 +3,13 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
+
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JTextArea;
 
-public class UserGUI {
+public class UserGUI{ //extends Client implements ActionListener{
 
 	private JFrame frame;
 	private JTextField textField;
@@ -74,6 +75,7 @@ public class UserGUI {
 		comboBox.setBounds(146, 79, 139, 22);
 		frame.getContentPane().add(comboBox);
 		
+		
 		JButton btnNewButton = new JButton("Enable");
 		btnNewButton.setBounds(311, 79, 89, 23);
 		frame.getContentPane().add(btnNewButton);
@@ -85,16 +87,67 @@ public class UserGUI {
 		JButton btnNewButton_1 = new JButton("Encrypt");
 		btnNewButton_1.setBounds(267, 138, 89, 23);
 		frame.getContentPane().add(btnNewButton_1);
+		//be able to encrypt the message based on the cipher choosen by user
+		btnNewButton.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if(comboBox.getSelectedItem().equals("RSA"))
+				{
+					//calling the RSA class
+					//RSA encrypt = new RSA(textField_2.getText());
+					
+				}
+				else if(e.getSelectedItem().equals("Stream Cipher"))
+				{
+					//calling the Stream Cipher class
+					//StreamCipher encrypt = new StreamCipher(textField_2.getText());
+				}
+				else if(e.getSelectedItem().equals("Block Cipher"))
+				{
+					//calling the Block cipher class
+					//BlockCipher encrypt = new BlockCipher(textField_2.getText());
+				}
+				else if(e.getSelectedItem().equals("Monoalphabetic"))
+				{
+					//calling the Monoalphabetic class
+				}
+				else if(e.getSelectedItem().equals("Vigenere"))
+				{
+					//calling the Vignere Class
+					//VignereCipher encrypt = new VignereCipher(textField_2.getText());
+				}
+			}
+		});
 		
 		textField_2 = new JTextField();
 		textField_2.setBounds(68, 139, 150, 20);
 		frame.getContentPane().add(textField_2);
 		textField_2.setColumns(10);
 		
+		//Connect to port and IP address
 		JButton btnNewButton_2 = new JButton("Connect");
 		btnNewButton_2.setBounds(237, 10, 89, 23);
 		frame.getContentPane().add(btnNewButton_2);
-		
+		/*btnNewButton_2.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if(e.getActionCommand().equals("Connect"))
+				{
+					try
+					{
+						int port = Integer.parseInt(textField.getText());
+						Client c = new Client(textField_1.getText(), port);
+					}
+					catch( Exception ex)
+					{
+						textArea.append("Error: " + ex);
+					}
+				}
+			}
+		});*/
+
 		JLabel lblNewLabel_4 = new JLabel("Encyrpted Message: ");
 		lblNewLabel_4.setBounds(10, 183, 125, 14);
 		frame.getContentPane().add(lblNewLabel_4);
