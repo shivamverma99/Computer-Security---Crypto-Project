@@ -43,6 +43,7 @@ public class CryptoSystem extends JFrame{
 					String[] dest;
 					String message;
 					String sender;
+					String wrongCipher = "Your cipher needs to match that of the receiver, please change the cipher";
 					while (true) {
 						try {
 							Socket sockNew = sock.accept();
@@ -56,13 +57,18 @@ public class CryptoSystem extends JFrame{
 								threadCounter++;
 							}
 							for (int i = 0; i < threadCounter; i++) {
-								if (clients[threadCounter].alert) {
+								if (clients[threadCounter].alertUser) {
 									message = clients[threadCounter].message;
 									dest = clients[threadCounter].destinations;
 									sender = clients[threadCounter].name;
 									for (int j = 0; j < dest.length; j++) {
 										for (int k = 0; k < threadNameType.length; k++) {
 											if (threadNameType[k].contains(dest[j])) {
+												if (!(clients[k].cipher.equals(clients[threadCounter].cipher))) {
+													clients[threadCounter].setIncomingMessage(("For receiver " + clients[k].name + " " + wrongCipher), "CryptoSystem");
+													continue;
+												}
+												
 												clients[k].setIncomingMessage(message, sender);
 											}
 										}
