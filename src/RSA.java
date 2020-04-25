@@ -10,16 +10,7 @@ import java.security.spec.X509EncodedKeySpec;
 import javax.crypto.Cipher;
 
 public class RSA {
-	public static void main(String args[]) throws Exception {
-		KeyPair pair = createKeys();
-		byte[] publicKey = pair.getPublic().getEncoded();
-		byte[] privateKey = pair.getPrivate().getEncoded();
-		String plaintext = "Put whatever you want right here";
-		byte[] encrypted = encrypt(publicKey, plaintext.getBytes());
-		System.out.println(new String(encrypted));
-		byte[] decrypted = decrypt(privateKey, encrypted);
-		System.out.println(new String(decrypted));
-	}
+	
 	public static KeyPair createKeys() throws Exception {
 		KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
 		SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "SUN");
@@ -28,17 +19,17 @@ public class RSA {
 		return pair;
 	}
 	public static byte[] encrypt(byte[] publicKey, byte[] plainText) throws Exception{
-		PublicKey key = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(publicKey));
-		Cipher cipher = Cipher.getInstance("RSA");
-		cipher.init(Cipher.ENCRYPT_MODE, key);
-		byte[] cipherText = cipher.doFinal(plainText);
+		PublicKey newKey = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(publicKey));
+		Cipher c = Cipher.getInstance("RSA");
+		c.init(Cipher.ENCRYPT_MODE, newKey);
+		byte[] cipherText = c.doFinal(plainText);
 		return cipherText;
 	}
 	public static byte[] decrypt(byte[] privateKey, byte[] cipherText) throws Exception{
-		PrivateKey key = KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(privateKey));
-		Cipher cipher = Cipher.getInstance("RSA");
-		cipher.init(Cipher.DECRYPT_MODE, key);
-		byte[] plainText = cipher.doFinal(cipherText);
+		PrivateKey newKey = KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(privateKey));
+		Cipher c = Cipher.getInstance("RSA");
+		c.init(Cipher.DECRYPT_MODE, newKey);
+		byte[] plainText = c.doFinal(cipherText);
 		return plainText;
 	}
 }
