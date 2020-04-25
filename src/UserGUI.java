@@ -37,7 +37,22 @@ public class UserGUI{ //extends Client implements ActionListener{
 	 */
 	public UserGUI() {
 		initialize();
+	
 	}
+	protected String getRandomString(int n) {
+        	String SALTCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        	StringBuilder salt = new StringBuilder();
+        	Random rnd = new Random();
+        	while (salt.length() < n) { // length of the random string.
+            		int index = (int) (rnd.nextFloat() * SALTCHARS.length());
+            		salt.append(SALTCHARS.charAt(index));
+        	}
+        	String saltStr = salt.toString();
+       		return saltStr;
+
+    }
+	
+	
 
 	/**
 	 * Initialize the contents of the frame.
@@ -92,8 +107,23 @@ public class UserGUI{ //extends Client implements ActionListener{
 		{
 			public void actionPerformed(ActionEvent e)
 			{
+				String plainText = textField_2.getText();
 				if(comboBox.getSelectedItem().equals("RSA"))
 				{
+					RSA rsa = new RSA();
+					try {
+						byte[] plainTextBytes = plainText.getBytes();
+						KeyPair pair = rsa.createKeys();
+						byte[] priKey = pair.getPrivate().getEncoded();
+						byte[] pubKey = pair.getPublic().getEncoded();
+						byte[] encryptedBytes = rsa.encrypt(pubKey, plainTextBytes);
+						String encryptedText = new String(encryptedBytes);
+						textArea.setText(encryptedText);
+						
+					}
+					catch(Exception ex) {
+						System.out.println(ex);
+					}
 					//calling the RSA class
 					//RSA encrypt = new RSA(textField_2.getText());
 					
@@ -111,9 +141,17 @@ public class UserGUI{ //extends Client implements ActionListener{
 				else if(e.getSelectedItem().equals("Monoalphabetic"))
 				{
 					//calling the Monoalphabetic class
+					MonoCipher cipher = new MonoCipher();
+					String cipherText = cipher.encrypt(plainText);
+					textArea.setText(cipherText);
 				}
 				else if(e.getSelectedItem().equals("Vigenere"))
 				{
+					VigenereCipher cipher = new VigenereCipher();
+					String key = getRandomString(plainText.length());
+					String cipherText = cipher.encrypt(plainText, key);
+					textArea.setText(cipherText);
+
 					//calling the Vignere Class
 					//VignereCipher encrypt = new VignereCipher(textField_2.getText());
 				}
