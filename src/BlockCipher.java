@@ -5,19 +5,22 @@ import javax.crypto.*;
 public class BlockCipher {
 
     public static void main(String[] args) throws Exception {
-        String encryptedFile = "encryptedtext.txt";
-        String decryptedFile = "decryptedtext.txt";
-        KeyGenerator key = KeyGenerator.getInstance("AES");
-        key.init(64);
+        
+         //This is the encrypt method for block. To change this method to a stream cipher mode, just change the "AES" to "CFB"
+        KeyGenerator key = KeyGenerator.getInstance("AES"); 
+        String plainText = "Get from the textblock";
+        key.init(256);
         SecretKey secretKey = key.generateKey();
-        Cipher aesCipher = Cipher.getInstance("AES");
-        byte[] byteText = "Some test for encryption".getBytes();
-        aesCipher.init(Cipher.ENCRYPT_MODE, secretKey);
-        byte[] byteCipherText = aesCipher.doFinal(byteText);
-        Files.write(Paths.get(encryptedFile), byteCipherText);
+        Cipher cipher = Cipher.getInstance("AES");
+        byte[] byteText = plainText.getBytes();
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+        byte[] byteCipherText = cipher.doFinal(byteText);
+        String cText = byteCipherText.toString();
+        
+        //This is the decrypt method for block
         byte[] cipherText = Files.readAllBytes(Paths.get(encryptedFile));
-        aesCipher.init(Cipher.DECRYPT_MODE, secretKey);
+        cipher.init(Cipher.DECRYPT_MODE, secretKey);
         byte[] bytePlainText = aesCipher.doFinal(cipherText);
-        Files.write(Paths.get(decryptedFile), bytePlainText);
+        String plainText = bytePlainText.toString();
     }
 }

@@ -9,8 +9,8 @@ class ServerThread extends Thread{
 	String userNameAndType;
 	boolean alertUser, alertAttacker;
 	String sender, name, dataType, message, cipher, tool, mode, ptGuess, ctGuess, conversation, key;
-	String[] destinations, victims;
-	int numDest;
+	String[] destinations, victims, cipherText, plainText;
+	int numDest, messageCounter = 0;
 	String incomingMessage, incomingSource;
 	
 	//Sets up the socket, print writer, and the buffered reader
@@ -49,15 +49,45 @@ class ServerThread extends Thread{
 						dataType = fullMessage.substring(0, fullMessage.indexOf(','));
 						fullMessage = fullMessage.substring(fullMessage.indexOf(',') + 1);
 						if (dataType == "Cipher") {
-							cipher = fullMessage.substring(0, fullMessage.indexOf(','));
+							if (fullMessage.contains("RSA")) {
+								cipher = fullMessage.substring(0, fullMessage.indexOf(','));
+								fullMessage = fullMessage.substring(fullMessage.indexOf(',') + 1);
+								key = fullMessage;
+								pwSock.println("Cipher has been registered as " + cipher + ". Key has been registered as " + key);
+							} else if (fullMessage.contains("Stream Cipher")) {
+								cipher = fullMessage.substring(0, fullMessage.indexOf(','));
+								fullMessage = fullMessage.substring(fullMessage.indexOf(',') + 1);
+								key = fullMessage;
+								pwSock.println("Cipher has been registered as " + cipher + ". Key has been registered as " + key);
+							} else if (fullMessage.contains("Block Cipher")) {
+								cipher = fullMessage.substring(0, fullMessage.indexOf(','));
+								fullMessage = fullMessage.substring(fullMessage.indexOf(',') + 1);
+								key = fullMessage;
+								pwSock.println("Cipher has been registered as " + cipher + ". Key has been registered as " + key);
+							} else if (fullMessage.contains("Monoalphabetic")) {
+								cipher = fullMessage;
+								pwSock.println("Cipher has been registered as " + cipher);
+							} else if (fullMessage.contains("Vignere")) {
+								cipher = fullMessage.substring(0, fullMessage.indexOf(','));
+								fullMessage = fullMessage.substring(fullMessage.indexOf(',') + 1);
+								key = fullMessage;
+								pwSock.println("Cipher has been registered as " + cipher + ". Key has been registered as " + key);
+							} else if (fullMessage.contains("Hill Cipher")) {
+								cipher = fullMessage;
+								pwSock.println("Cipher has been registered as " + cipher);
+							}
 							
-							pwSock.println("Cipher has been registered as " + cipher);
+							
 							continue;
 						} else if (dataType == "Message") {
 							sender = fullMessage.substring(0, fullMessage.indexOf(','));
 							fullMessage = fullMessage.substring(fullMessage.indexOf(',') + 1);
 							name = fullMessage.substring(0, fullMessage.indexOf(','));
 							fullMessage = fullMessage.substring(fullMessage.indexOf(',') + 1);	
+							if (cipher == "Hill Cipher") {
+								key = fullMessage.substring(0, fullMessage.indexOf(','));
+								fullMessage = fullMessage.substring(fullMessage.indexOf(',' + 1));
+							}
 							numDest = Integer.parseInt(fullMessage.substring(0, 1));
 							destinations = new String[numDest];
 							fullMessage = fullMessage.substring(fullMessage.indexOf(',') + 1);
@@ -66,6 +96,8 @@ class ServerThread extends Thread{
 								fullMessage = fullMessage.substring(fullMessage.indexOf(',') + 1);
 							}
 							message = fullMessage;
+							cipherText[messageCounter] = message;
+							messageCounter++;
 							alertUser = true;
 						
 						} else if (dataType == "Quit") {
