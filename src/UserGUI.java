@@ -1,6 +1,8 @@
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.KeyPair;
 import java.util.Random;
 
@@ -9,6 +11,9 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import javax.swing.JComboBox;
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JTextArea;
@@ -175,13 +180,30 @@ public class UserGUI{ //extends Client implements ActionListener{
 				}
 				else if(comboBox.getSelectedItem().equals("Stream Cipher"))
 				{
-					//calling the Stream Cipher class
-					//StreamCipher encrypt = new StreamCipher(textField_2.getText());
+			     /*   KeyGenerator key = KeyGenerator.getInstance("CFB"); 
+			        key.init(256);
+			        SecretKey secretKey = key.generateKey();
+			        Cipher cipher = Cipher.getInstance("CFB");
+			        byte[] byteText = plainText.getBytes();
+			        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+			        byte[] byteCipherText = cipher.doFinal(byteText);
+			        String cText = byteCipherText.toString();
+			        */
 				}
 				else if(comboBox.getSelectedItem().equals("Block Cipher"))
 				{
-					//calling the Block cipher class
-					//BlockCipher encrypt = new BlockCipher(textField_2.getText());
+			       /* KeyGenerator key = KeyGenerator.getInstance("AES"); 
+			       // String plainText = "Get from the textblock";
+			        key.init(256);
+			        SecretKey secretKey = key.generateKey();
+			        Cipher cipher = Cipher.getInstance("AES");
+			        byte[] byteText = plainText.getBytes();
+			        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+			        byte[] byteCipherText = cipher.doFinal(byteText);
+			        String cText = byteCipherText.toString();
+			        */
+
+			
 				}
 				else if(comboBox.getSelectedItem().equals("Monoalphabetic"))
 				{
@@ -201,8 +223,10 @@ public class UserGUI{ //extends Client implements ActionListener{
 					//VignereCipher encrypt = new VignereCipher(textField_2.getText());
 				}
 				else if (comboBox.getSelectedItem().equals("Hill Cipher")) {
-					//Use getRandomString() to make a key of size plaintext^2
-					//This means we need a different key for each message being sent
+					HillCipher cipher = new HillCipher();
+					String key = getRandomString(plainText.length());
+					String cipherText = cipher.encrypt(key, plainText);
+					textArea.setText(cipherText);
 				}
 			}
 		});
@@ -216,7 +240,7 @@ public class UserGUI{ //extends Client implements ActionListener{
 		JButton btnNewButton_2 = new JButton("Connect");
 		btnNewButton_2.setBounds(237, 10, 89, 23);
 		frame.getContentPane().add(btnNewButton_2);
-		/*btnNewButton_2.addActionListener(new ActionListener()
+		btnNewButton_2.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -233,7 +257,7 @@ public class UserGUI{ //extends Client implements ActionListener{
 					}
 				}
 			}
-		});*/
+		});
 
 		
 	}
