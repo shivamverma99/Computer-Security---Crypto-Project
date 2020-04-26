@@ -8,7 +8,7 @@ class ServerThread extends Thread{
 	BufferedReader br;
 	String userNameAndType;
 	boolean alertUser, alertAttacker;
-	String sender, name, dataType, message, cipher, tool, mode, ptGuess, ctGuess, conversation;
+	String sender, name, dataType, message, cipher, tool, mode, ptGuess, ctGuess, conversation, key;
 	String[] destinations, victims;
 	int numDest;
 	String incomingMessage, incomingSource;
@@ -39,7 +39,7 @@ class ServerThread extends Thread{
 		String userName = intro;
 		userNameAndType = userName + ',' + userType;
 		pwSock.println("Hello, " + userName + ". Welcome to the chat.");
-		boolean quit = false, cipherBool = false, modeBool = false, toolBool = false, convBool = false;
+		boolean quit = false, modeBool = false, toolBool = false, convBool = false;
 		
 		
 			try {
@@ -48,13 +48,10 @@ class ServerThread extends Thread{
 						String fullMessage = br.readLine();
 						dataType = fullMessage.substring(0, fullMessage.indexOf(','));
 						fullMessage = fullMessage.substring(fullMessage.indexOf(',') + 1);
-						if (dataType == "Cipher" && !cipherBool) {
-							cipher = fullMessage;
-							cipherBool = true;
+						if (dataType == "Cipher") {
+							cipher = fullMessage.substring(0, fullMessage.indexOf(','));
+							
 							pwSock.println("Cipher has been registered as " + cipher);
-							continue;
-						} else if (dataType == "Cipher" && cipherBool) {
-							pwSock.println("Cipher has already been chosen, cannot change now.");
 							continue;
 						} else if (dataType == "Message") {
 							sender = fullMessage.substring(0, fullMessage.indexOf(','));

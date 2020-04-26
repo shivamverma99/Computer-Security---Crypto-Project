@@ -1,4 +1,8 @@
 import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.security.KeyPair;
+import java.util.Random;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -86,7 +90,7 @@ public class UserGUI{ //extends Client implements ActionListener{
 		frame.getContentPane().add(lblNewLabel_2);
 		
 		JComboBox comboBox = new JComboBox();
-		comboBox.setModel(new DefaultComboBoxModel(new String[] {"RSA", "Stream Cipher", "Block Cipher", "Monoalphabetic", "Vigenere"}));
+		comboBox.setModel(new DefaultComboBoxModel(new String[] {"RSA", "Stream Cipher", "Block Cipher", "Monoalphabetic", "Vigenere", "Hill Cipher"}));
 		comboBox.setBounds(146, 79, 139, 22);
 		frame.getContentPane().add(comboBox);
 		
@@ -99,93 +103,6 @@ public class UserGUI{ //extends Client implements ActionListener{
 		lblNewLabel_3.setBounds(10, 142, 81, 14);
 		frame.getContentPane().add(lblNewLabel_3);
 		
-		JButton btnNewButton_1 = new JButton("Encrypt");
-		btnNewButton_1.setBounds(267, 138, 89, 23);
-		frame.getContentPane().add(btnNewButton_1);
-		//be able to encrypt the message based on the cipher choosen by user
-		btnNewButton.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				String plainText = textField_2.getText();
-				if(comboBox.getSelectedItem().equals("RSA"))
-				{
-					RSA rsa = new RSA();
-					try {
-						byte[] plainTextBytes = plainText.getBytes();
-						KeyPair pair = rsa.createKeys();
-						byte[] priKey = pair.getPrivate().getEncoded();
-						byte[] pubKey = pair.getPublic().getEncoded();
-						byte[] encryptedBytes = rsa.encrypt(pubKey, plainTextBytes);
-						String encryptedText = new String(encryptedBytes);
-						textArea.setText(encryptedText);
-						
-					}
-					catch(Exception ex) {
-						System.out.println(ex);
-					}
-					//calling the RSA class
-					//RSA encrypt = new RSA(textField_2.getText());
-					
-				}
-				else if(e.getSelectedItem().equals("Stream Cipher"))
-				{
-					//calling the Stream Cipher class
-					//StreamCipher encrypt = new StreamCipher(textField_2.getText());
-				}
-				else if(e.getSelectedItem().equals("Block Cipher"))
-				{
-					//calling the Block cipher class
-					//BlockCipher encrypt = new BlockCipher(textField_2.getText());
-				}
-				else if(e.getSelectedItem().equals("Monoalphabetic"))
-				{
-					//calling the Monoalphabetic class
-					MonoCipher cipher = new MonoCipher();
-					String cipherText = cipher.encrypt(plainText);
-					textArea.setText(cipherText);
-				}
-				else if(e.getSelectedItem().equals("Vigenere"))
-				{
-					VigenereCipher cipher = new VigenereCipher();
-					String key = getRandomString(plainText.length());
-					String cipherText = cipher.encrypt(plainText, key);
-					textArea.setText(cipherText);
-
-					//calling the Vignere Class
-					//VignereCipher encrypt = new VignereCipher(textField_2.getText());
-				}
-			}
-		});
-		
-		textField_2 = new JTextField();
-		textField_2.setBounds(68, 139, 150, 20);
-		frame.getContentPane().add(textField_2);
-		textField_2.setColumns(10);
-		
-		//Connect to port and IP address
-		JButton btnNewButton_2 = new JButton("Connect");
-		btnNewButton_2.setBounds(237, 10, 89, 23);
-		frame.getContentPane().add(btnNewButton_2);
-		/*btnNewButton_2.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				if(e.getActionCommand().equals("Connect"))
-				{
-					try
-					{
-						int port = Integer.parseInt(textField.getText());
-						Client c = new Client(textField_1.getText(), port);
-					}
-					catch( Exception ex)
-					{
-						textArea.append("Error: " + ex);
-					}
-				}
-			}
-		});*/
-
 		JLabel lblNewLabel_4 = new JLabel("Encyrpted Message: ");
 		lblNewLabel_4.setBounds(10, 183, 125, 14);
 		frame.getContentPane().add(lblNewLabel_4);
@@ -226,6 +143,98 @@ public class UserGUI{ //extends Client implements ActionListener{
 		JTextArea textArea_2 = new JTextArea();
 		textArea_2.setBounds(205, 305, 183, 163);
 		frame.getContentPane().add(textArea_2);
+		
+		JButton btnNewButton_1 = new JButton("Encrypt");
+		btnNewButton_1.setBounds(267, 138, 89, 23);
+		frame.getContentPane().add(btnNewButton_1);
+		//be able to encrypt the message based on the cipher choosen by user
+		btnNewButton.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				String plainText = textField_2.getText();
+				if(comboBox.getSelectedItem().equals("RSA"))
+				{
+					RSA rsa = new RSA();
+					try {
+						byte[] plainTextBytes = plainText.getBytes();
+						KeyPair pair = rsa.createKeys();
+						byte[] priKey = pair.getPrivate().getEncoded();
+						byte[] pubKey = pair.getPublic().getEncoded();
+						byte[] encryptedBytes = rsa.encrypt(pubKey, plainTextBytes);
+						String encryptedText = new String(encryptedBytes);
+						textArea.setText(encryptedText);
+						
+					}
+					catch(Exception ex) {
+						System.out.println(ex);
+					}
+					//calling the RSA class
+					//RSA encrypt = new RSA(textField_2.getText());
+					
+				}
+				else if(comboBox.getSelectedItem().equals("Stream Cipher"))
+				{
+					//calling the Stream Cipher class
+					//StreamCipher encrypt = new StreamCipher(textField_2.getText());
+				}
+				else if(comboBox.getSelectedItem().equals("Block Cipher"))
+				{
+					//calling the Block cipher class
+					//BlockCipher encrypt = new BlockCipher(textField_2.getText());
+				}
+				else if(comboBox.getSelectedItem().equals("Monoalphabetic"))
+				{
+					//calling the Monoalphabetic class
+					MonoCipher cipher = new MonoCipher();
+					String cipherText = cipher.encrypt(plainText);
+					textArea.setText(cipherText);
+				}
+				else if(comboBox.getSelectedItem().equals("Vigenere"))
+				{
+					VignereCipher cipher = new VignereCipher();
+					String key = getRandomString(plainText.length()); //Send this key to server
+					String cipherText = cipher.encrypt(plainText, key);
+					textArea.setText(cipherText);
+
+					//calling the Vignere Class
+					//VignereCipher encrypt = new VignereCipher(textField_2.getText());
+				}
+				else if (comboBox.getSelectedItem().equals("Hill Cipher")) {
+					
+				}
+			}
+		});
+		
+		textField_2 = new JTextField();
+		textField_2.setBounds(68, 139, 150, 20);
+		frame.getContentPane().add(textField_2);
+		textField_2.setColumns(10);
+		
+		//Connect to port and IP address
+		JButton btnNewButton_2 = new JButton("Connect");
+		btnNewButton_2.setBounds(237, 10, 89, 23);
+		frame.getContentPane().add(btnNewButton_2);
+		/*btnNewButton_2.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if(e.getActionCommand().equals("Connect"))
+				{
+					try
+					{
+						int port = Integer.parseInt(textField.getText());
+						Client c = new Client(textField_1.getText(), port);
+					}
+					catch( Exception ex)
+					{
+						textArea.append("Error: " + ex);
+					}
+				}
+			}
+		});*/
+
+		
 	}
 
 }
