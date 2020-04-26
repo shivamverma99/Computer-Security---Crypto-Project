@@ -201,7 +201,8 @@ public class UserGUI{ //extends Client implements ActionListener{
 					//VignereCipher encrypt = new VignereCipher(textField_2.getText());
 				}
 				else if (comboBox.getSelectedItem().equals("Hill Cipher")) {
-					
+					//Use getRandomString() to make a key of size plaintext^2
+					//This means we need a different key for each message being sent
 				}
 			}
 		});

@@ -1,15 +1,7 @@
 
 import Jama.Matrix;
 public class HillCipher {
-	public static void main(String[] args) {
-		String plainText = "ACT";
-		String key = "GYBNQKURP";
-		String cipherText = encrypt(key, plainText);
-		System.out.println(cipherText);
-		plainText = decrypt(key, plainText);
-		System.out.println(plainText);
-		
-	}
+	
 	static void getKeyMatrix(String key, int matrixKey[][]) {
 		int x = 0;
 		for(int y = 0; y < matrixKey.length; y++) {
