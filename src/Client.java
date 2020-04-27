@@ -13,7 +13,7 @@ public class Client
      * @param address
      * @param port
      */
-    public Client(String address, int port) 
+    public Client(String address, int port, String data) 
     { 
         //establish connection 
         try
@@ -21,10 +21,8 @@ public class Client
             socket = new Socket(address, port); 
             System.out.println("Connected"); 
   
-            // takes input from terminal 
-            input = new DataInputStream(System.in); 
-  
-            // sends output to the socket 
+            // data is the input from the terminal 
+            // out sends output to the socket 
             out = new DataOutputStream(socket.getOutputStream()); 
         } 
         catch(UnknownHostException UHexc) 
@@ -36,22 +34,17 @@ public class Client
             System.out.println(IOexc); 
         } 
   
-        // string to read message from input 
-        String line = ""; 
-  
-        // keep reading until user inputs Send 
-        while (!line.equals("Send")) 
+        // send message to the server 
+
+        try
         { 
-            try
-            { 
-                line = input.readLine(); 
-                out.writeUTF(line); 
-            } 
-            catch(IOException exc) 
-            { 
-                System.out.println(exc); 
-            } 
+            out.writeUTF(data); 
         } 
+        catch(IOException exc) 
+        { 
+            System.out.println(exc); 
+        } 
+         
   
         // close the connection 
         try
@@ -64,7 +57,7 @@ public class Client
         { 
             System.out.println(i); 
         } 
-    } 
-  
+     
+    }
     
 } 
