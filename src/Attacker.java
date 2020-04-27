@@ -100,7 +100,7 @@ public class Attacker {
 		return cipher;
 	}
 	
-	public static void main(String[] args) {	
+	/*public static void main(String[] args) {	
 		
 		String attackType = "";
 		String attackInputs = "";
@@ -199,5 +199,5 @@ public class Attacker {
 		}
 		
 		System.out.print("GoodBye");
-	}
+	}*/
 }
