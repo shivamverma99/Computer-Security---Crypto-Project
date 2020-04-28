@@ -368,7 +368,7 @@ public class UserGUI{ //extends Client implements ActionListener{
 					else if(comboBox.getSelectedItem().equals("Stream Cipher"))
 					{
 						try {
-					        Cipher cipher = Cipher.getInstance("CFB");
+					        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
 					        byte[] byteText = plainText.getBytes();
 					        cipher.init(Cipher.ENCRYPT_MODE, streamKey);
 					        byte[] byteCipherText = cipher.doFinal(byteText);
@@ -385,7 +385,7 @@ public class UserGUI{ //extends Client implements ActionListener{
 					{
 				      
 				        try {
-					        Cipher cipher = Cipher.getInstance("AES/CFB8/NoPadding");
+					        Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
 					        byte[] byteText = plainText.getBytes();
 					        cipher.init(Cipher.ENCRYPT_MODE, blockKey);
 					        byte[] byteCipherText = cipher.doFinal(byteText);
