@@ -217,6 +217,8 @@ public class Attacker {
 		
 		//ANALYZE LETTERS BY COUNTING THEIR APPEARANCE
 		int[] freqAnalTable = new int[26];
+		char[] freqChar = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
+		char[] freqCipher = {'e','t','a','o','i','n','s','r','h','d','l','u','c','m','f','y','w','g','p','b','v','k','x','q','j','z'};
 		returnString = returnString.toLowerCase();
 		int j = 0;
 		int i = 0;
@@ -225,14 +227,30 @@ public class Attacker {
 			if (j >= 0 && j < 26)
 				freqAnalTable[j] += 1;
 		}
+		
+		//SORT ARRAY AND MATCH TO CIPHER VALUE BASED ON FREQUENCY ANALYSIS
+		int temp;
+		char tempC;
 		for (i = 0; i < 26; i++) {
-			for (j = 0; j < 26; j++) {
-				if (freqAnalTable[j] > freqAnalTable[i]) {
-					
-				}
-			}
-			
+            		for (j = i + 1; j < 26; j++) {
+                		if (freqAnalTable[i] > freqAnalTable[j]) {
+                    		temp = freqAnalTable[i];
+                    		freqAnalTable[i] = freqAnalTable[j];
+                    		freqAnalTable[j] = temp;
+                    
+                    		tempC = freqChar[i];
+                    		freqChar[i] = freqChar[j];
+                    		freqChar[j] = tempC;
+                		}
+            		}
+       		 }
+		
+		//PRINT LETTERS AND CORRESPONDING CIPHER VALUE
+		
+		for (i = 0; i < 26; i++) {
+			System.out.println(freqCipher[i] + " = " + freqChar[i]);
 		}
+		
 	}
 	
 	/*public static void main(String[] args) {	
