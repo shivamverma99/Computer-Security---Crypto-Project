@@ -131,7 +131,11 @@ public class AttackerGUI {
         JButton freqButton = new JButton("Frequency Analysis");
         freqButton.setBounds(100, 175, 200, 21);
         frame.getContentPane().add(freqButton);
-
+	
+	JButton bruteforceButton = new JButton("Brute Force");
+        bruteforceButton.setBounds(300, 175, 200, 21);
+        frame.getContentPane().add(bruteforceButton);
+	
         JLabel lblNewLabel_6 = new JLabel("Toolbox Data:");
         lblNewLabel_6.setBounds(10, 203, 87, 14);
         frame.getContentPane().add(lblNewLabel_6);
