@@ -3,6 +3,8 @@ import java.awt.EventQueue;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JScrollPane;
+
 import java.awt.BorderLayout;
 import javax.swing.JTextField;
 import javax.swing.Timer;
@@ -135,24 +137,33 @@ public class AttackerGUI {
         frame.getContentPane().add(lblNewLabel_6);
 
         JTextArea textArea = new JTextArea();
-        textArea.setBounds(20, 222, 327, 103);
-        frame.getContentPane().add(textArea);
+        //textArea.setBounds(20, 222, 327, 103);
+        //frame.getContentPane().add(textArea);
+        JScrollPane scrollPane = new JScrollPane(textArea);
+		scrollPane.setBounds(20, 222, 327, 103);
+		frame.getContentPane().add(scrollPane);
 
         JLabel serverOutputlbl = new JLabel("System Messages: ");
         serverOutputlbl.setBounds(10, 340, 121, 14);
         frame.getContentPane().add(serverOutputlbl);
 
         JTextArea serverOutput = new JTextArea();
-        serverOutput.setBounds(20, 356, 327, 113);
-        frame.getContentPane().add(serverOutput);
+        serverOutput.setWrapStyleWord(true);
+        serverOutput.setLineWrap(true);
+        JScrollPane scrollPane1 = new JScrollPane(serverOutput);
+		scrollPane.setBounds(20, 356, 327, 113);
+		frame.getContentPane().add(scrollPane);  
+        //frame.getContentPane().add(serverOutput);
 
         JLabel guessLbl = new JLabel("Enter Guess Below: ");
         guessLbl.setBounds(10, 480, 121, 14);
         frame.getContentPane().add(guessLbl);
 
         JTextArea guessArea = new JTextArea();
-        guessArea.setBounds(20, 500, 327, 113);
-        frame.getContentPane().add(guessArea);
+        JScrollPane scrollPane2 = new JScrollPane(textArea);
+		scrollPane.setBounds(20, 500, 327, 113);
+		frame.getContentPane().add(scrollPane);
+        //frame.getContentPane().add(guessArea);
 
         JButton guessButton = new JButton("Guess");
         guessButton.setBounds(130, 620, 81, 25);

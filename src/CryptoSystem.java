@@ -118,19 +118,24 @@ public class CryptoSystem{
 				
 				for (int i = 0; i <= threadCounter; i++) {
 					if (clients[i].alertUser) { //This means user is trying to send a message to another user, the message will be decrypted and sent
+						System.out.println("User wants to send");
 						message = clients[i].message;
 						if (clients[i].cipher.contains("RSA")) {
-							System.out.println("At RSA)");
 							decryptedBytes = RSA.decrypt(Base64.getDecoder().decode(clients[i].key), message.getBytes());
-							System.out.println("did decryption");
 							decryptedString = decryptedBytes.toString();
 							clients[i].plainText[clients[i].messageCounter - 1] = decryptedString;
 						} else if (clients[i].cipher.contains("Stream Cipher")) {
+							System.out.println("At stream");
 							byte[] cipherText = message.getBytes();
-					        Cipher cipher = Cipher.getInstance("CFB");
+							System.out.println("Made ct byte array");
+					        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
+					        System.out.println("Made cipher");
 					        byte[] decodedKey = Base64.getDecoder().decode(clients[i].key);
-					        SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "CFB");
+					        System.out.println("Decoded key");
+					        SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");
+					        System.out.println("Made secret key");
 					        cipher.init(Cipher.DECRYPT_MODE, secretKey);
+					        System.out.println("Initialized cipher");
 					        decryptedBytes = cipher.doFinal(cipherText);
 					        decryptedString = decryptedBytes.toString();
 							clients[i].plainText[clients[i].messageCounter - 1] = decryptedString;
@@ -205,9 +210,9 @@ public class CryptoSystem{
 							ptGuess = decryptedGuess.toString();
 						} else if (clients[victimCounter].cipher.contains("Stream Cipher")) {
 							byte[] cipherText = Base64.getEncoder().encode(ctGuess.getBytes());
-					        Cipher cipher = Cipher.getInstance("CFB");
+					        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
 					        byte[] decodedKey = Base64.getDecoder().decode(clients[victimCounter].key);
-					        SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "CFB");
+					        SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");
 					        cipher.init(Cipher.DECRYPT_MODE, secretKey);
 					        decryptedGuess = cipher.doFinal(cipherText);
 							ptGuess = decryptedGuess.toString();
@@ -238,15 +243,18 @@ public class CryptoSystem{
 						}
 						clients[i].alertAttackerGuess = false;
 					} else if (clients[i].alertAttackerOracle) { //Means attacker is making an oracle request for info, send the appropriate data
+						System.out.println("Attacker wants some info");
 						int victimCounter = 0;
 						for (victimCounter = 0; victimCounter < threadName.length; victimCounter++) {
 							if (threadName[victimCounter].contains(clients[i].victim))
 								break;
 						}
+						System.out.println("Attacker's victim is: " + clients[victimCounter].name);
 						if (!clients[victimCounter].cipherEnabled) {
 							clients[i].setIncomingMessage("Victim has not chosen a cipher yet, please wait and then try again", "CryptoSystem");
 						} else {
 							if (clients[i].mode.contains("Chosen Plaintext")) {
+								System.out.println("Attacker chooses chosen plaintext");
 								String ctOracle = clients[i].ctGuess;
 								String ptOracle;
 								if (clients[victimCounter].cipher.contains("RSA")) {
@@ -255,9 +263,9 @@ public class CryptoSystem{
 									clients[i].setIncomingMessage(("The plaintext is: " + ptOracle + "For the requested ciphertext: " + ctOracle), "CryptoSystem");
 								} else if (clients[victimCounter].cipher.contains("Stream Cipher")) {
 									byte[] cipherText = Base64.getEncoder().encode(ctOracle.getBytes());
-							        Cipher cipher = Cipher.getInstance("CFB");
+							        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
 							        byte[] decodedKey = Base64.getDecoder().decode(clients[victimCounter].key);
-							        SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "CFB");
+							        SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");
 							        cipher.init(Cipher.DECRYPT_MODE, secretKey);
 							        decryptedOracle = cipher.doFinal(cipherText);
 									ptOracle = decryptedOracle.toString();
@@ -272,8 +280,10 @@ public class CryptoSystem{
 									ptOracle = decryptedOracle.toString();
 									clients[i].setIncomingMessage(("The plaintext is: " + ptOracle + "For the requested ciphertext: " + ctOracle), "CryptoSystem");
 								} else if (clients[victimCounter].cipher.contains("Monoalphabetic")) {
+									System.out.println("victim uses monocipher");
 									ptOracle = MonoCipher.decrypt(ctOracle);
 									clients[i].setIncomingMessage(("The plaintext is: " + ptOracle + "For the requested ciphertext: " + ctOracle), "CryptoSystem");
+									System.out.println("Sent info to attacker");
 								} else if (clients[victimCounter].cipher.contains("Vigenere")) {
 									ptOracle = VigenereCipher.decrypt(ctOracle, clients[victimCounter].key);
 									clients[i].setIncomingMessage(("The plaintext is: " + ptOracle + "For the requested ciphertext: " + ctOracle), "CryptoSystem");
@@ -291,10 +301,10 @@ public class CryptoSystem{
 									ctOracle = encryptedOracle.toString();
 									clients[i].setIncomingMessage(("The ciphertext is: " + ctOracle + "For the requested plaintext: " + ptOracle), "CryptoSystem");
 								} else if (clients[victimCounter].cipher.contains("Stream Cipher")) {
-									KeyGenerator key = KeyGenerator.getInstance("CFB"); 
+									KeyGenerator key = KeyGenerator.getInstance("AES/CBC/PKCS5PADDING"); 
 							        key.init(256);
 							        byte[] decodedKey = Base64.getDecoder().decode(clients[victimCounter].key);
-							        SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "CFB");									        
+							        SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");									        
 							        Cipher cipher = Cipher.getInstance("CFB");
 							        byte[] byteText = ptOracle.getBytes();
 							        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
@@ -335,10 +345,10 @@ public class CryptoSystem{
 										cts[j] = encryptedOracle.toString();
 										clients[i].setIncomingMessage(("The ciphertext is: " + cts[j] + "For the given plaintext: " + ptOracle), "CryptoSystem");
 									} else if (clients[victimCounter].cipher.contains("Stream Cipher")) {
-										KeyGenerator key = KeyGenerator.getInstance("CFB"); 
+										KeyGenerator key = KeyGenerator.getInstance("AES/CBC/PKCS5PADDING"); 
 								        key.init(256);
 								        byte[] decodedKey = Base64.getDecoder().decode(clients[victimCounter].key);
-								        SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "CFB");									        
+								        SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");									        
 								        Cipher cipher = Cipher.getInstance("CFB");
 								        byte[] byteText = ptOracle.getBytes();
 								        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
@@ -381,10 +391,10 @@ public class CryptoSystem{
 										cts[j] = encryptedOracle.toString();
 										clients[i].setIncomingMessage(("The ciphertext is: " + cts[j]), "CryptoSystem");
 									} else if (clients[victimCounter].cipher.contains("Stream Cipher")) {
-										KeyGenerator key = KeyGenerator.getInstance("CFB"); 
+										KeyGenerator key = KeyGenerator.getInstance("AES/CBC/PKCS5PADDING"); 
 								        key.init(256);
 								        byte[] decodedKey = Base64.getDecoder().decode(clients[victimCounter].key);
-								        SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "CFB");									        
+								        SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");									        
 								        Cipher cipher = Cipher.getInstance("CFB");
 								        byte[] byteText = ptOracle.getBytes();
 								        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
