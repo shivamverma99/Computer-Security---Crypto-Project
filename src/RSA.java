@@ -19,14 +19,14 @@ public class RSA {
 		return pair;
 	}
 	public static byte[] encrypt(byte[] publicKey, byte[] plainText) throws Exception{
-		PublicKey newKey = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(publicKey));
+		PublicKey newKey = KeyFactory.getInstance("RSA/ECB/NoPadding").generatePublic(new X509EncodedKeySpec(publicKey));
 		Cipher c = Cipher.getInstance("RSA");
 		c.init(Cipher.ENCRYPT_MODE, newKey);
 		byte[] cipherText = c.doFinal(plainText);
 		return cipherText;
 	}
 	public static byte[] decrypt(byte[] privateKey, byte[] cipherText) throws Exception{
-		PrivateKey newKey = KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(privateKey));
+		PrivateKey newKey = KeyFactory.getInstance("RSA/ECB/NoPadding").generatePrivate(new PKCS8EncodedKeySpec(privateKey));
 		Cipher c = Cipher.getInstance("RSA");
 		c.init(Cipher.DECRYPT_MODE, newKey);
 		byte[] plainText = c.doFinal(cipherText);
