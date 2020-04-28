@@ -1,6 +1,10 @@
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.KeyPair;
@@ -24,6 +28,9 @@ public class UserGUI{ //extends Client implements ActionListener{
 	private JTextField textField;
 	private JTextField textField_1;
 	private JTextField textField_2;
+	Socket sock;
+	PrintWriter pwSock; //For the socket I/O
+	BufferedReader br;
 
 	/**
 	 * Launch the application.
@@ -103,6 +110,7 @@ public class UserGUI{ //extends Client implements ActionListener{
 		JButton btnNewButton = new JButton("Enable");
 		btnNewButton.setBounds(311, 79, 89, 23);
 		frame.getContentPane().add(btnNewButton);
+
 		
 		JLabel lblNewLabel_3 = new JLabel("Message: ");
 		lblNewLabel_3.setBounds(10, 142, 81, 14);
@@ -147,17 +155,48 @@ public class UserGUI{ //extends Client implements ActionListener{
 		
 		JTextArea textArea_2 = new JTextArea();
 		textArea_2.setBounds(205, 305, 183, 163);
+		
 		frame.getContentPane().add(textArea_2);
+		
+		//Connect to port and IP address
+				JButton btnNewButton_2 = new JButton("Connect");
+				btnNewButton_2.setBounds(237, 10, 89, 23);
+				frame.getContentPane().add(btnNewButton_2);
+				btnNewButton_2.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						if(e.getActionCommand().equals("Connect"))
+						{
+							try
+							{
+								int port = Integer.parseInt(textField.getText());
+								br = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+								pwSock = new PrintWriter(sock.getOutputStream(), true);
+								
+								
+								
+								//Client c = new Client(textField_1.getText(), port);
+							}
+							catch( Exception ex)
+							{
+								textArea.append("Error: " + ex);
+							}
+						}
+					}
+				});
 		
 		JButton btnNewButton_1 = new JButton("Encrypt");
 		btnNewButton_1.setBounds(267, 138, 89, 23);
 		frame.getContentPane().add(btnNewButton_1);
 		//be able to encrypt the message based on the cipher choosen by user
-		btnNewButton.addActionListener(new ActionListener()
+		btnNewButton_1.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
 				String plainText = textField_2.getText();
+				plainText = plainText.replaceAll("\\p{Punct}","");
+				
 				if(comboBox.getSelectedItem().equals("RSA"))
 				{
 					RSA rsa = new RSA();
@@ -168,7 +207,8 @@ public class UserGUI{ //extends Client implements ActionListener{
 						byte[] pubKey = pair.getPublic().getEncoded();
 						byte[] encryptedBytes = rsa.encrypt(pubKey, plainTextBytes);
 						String encryptedText = new String(encryptedBytes);
-						textArea.setText(encryptedText);
+						textArea.setText(encryptedText);							
+						pwSock.print("Cipher,RSA,"+encryptedText+","+priKey);
 						
 					}
 					catch(Exception ex) {
@@ -180,7 +220,8 @@ public class UserGUI{ //extends Client implements ActionListener{
 				}
 				else if(comboBox.getSelectedItem().equals("Stream Cipher"))
 				{
-			     /*   KeyGenerator key = KeyGenerator.getInstance("CFB"); 
+					/*
+			        KeyGenerator key = KeyGenerator.getInstance("CFB"); 
 			        key.init(256);
 			        SecretKey secretKey = key.generateKey();
 			        Cipher cipher = Cipher.getInstance("CFB");
@@ -188,12 +229,13 @@ public class UserGUI{ //extends Client implements ActionListener{
 			        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
 			        byte[] byteCipherText = cipher.doFinal(byteText);
 			        String cText = byteCipherText.toString();
+			        pwSock.print("Cipher,Stream Cipher,"+cText+","+secretKey);
 			        */
 				}
 				else if(comboBox.getSelectedItem().equals("Block Cipher"))
 				{
-			       /* KeyGenerator key = KeyGenerator.getInstance("AES"); 
-			       // String plainText = "Get from the textblock";
+			      /*
+			        KeyGenerator key = KeyGenerator.getInstance("AES"); 
 			        key.init(256);
 			        SecretKey secretKey = key.generateKey();
 			        Cipher cipher = Cipher.getInstance("AES");
@@ -201,16 +243,17 @@ public class UserGUI{ //extends Client implements ActionListener{
 			        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
 			        byte[] byteCipherText = cipher.doFinal(byteText);
 			        String cText = byteCipherText.toString();
+			        pwSock.print("Cipher,Block Cipher,"+cText+","+secretKey);
 			        */
-
-			
-				}
+			    }
 				else if(comboBox.getSelectedItem().equals("Monoalphabetic"))
 				{
 					//calling the Monoalphabetic class
 					MonoCipher cipher = new MonoCipher();
 					String cipherText = cipher.encrypt(plainText);
 					textArea.setText(cipherText);
+					pwSock.print("Cipher,Monoalphabetic,"+cipherText);
+					
 				}
 				else if(comboBox.getSelectedItem().equals("Vigenere"))
 				{
@@ -218,7 +261,7 @@ public class UserGUI{ //extends Client implements ActionListener{
 					String key = getRandomString(plainText.length()); //Send this key to server
 					String cipherText = cipher.encrypt(plainText, key);
 					textArea.setText(cipherText);
-
+					pwSock.print("Cipher,Vigenere,"+cipherText+","+key);
 					//calling the Vignere Class
 					//VignereCipher encrypt = new VignereCipher(textField_2.getText());
 				}
@@ -227,6 +270,7 @@ public class UserGUI{ //extends Client implements ActionListener{
 					String key = getRandomString(plainText.length());
 					String cipherText = cipher.encrypt(key, plainText);
 					textArea.setText(cipherText);
+					pwSock.print("Cipher,Hill Cipher,"+cipherText+","+key);
 				}
 			}
 		});
@@ -236,28 +280,7 @@ public class UserGUI{ //extends Client implements ActionListener{
 		frame.getContentPane().add(textField_2);
 		textField_2.setColumns(10);
 		
-		//Connect to port and IP address
-		JButton btnNewButton_2 = new JButton("Connect");
-		btnNewButton_2.setBounds(237, 10, 89, 23);
-		frame.getContentPane().add(btnNewButton_2);
-		btnNewButton_2.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				if(e.getActionCommand().equals("Connect"))
-				{
-					try
-					{
-						int port = Integer.parseInt(textField.getText());
-						Client c = new Client(textField_1.getText(), port);
-					}
-					catch( Exception ex)
-					{
-						textArea.append("Error: " + ex);
-					}
-				}
-			}
-		});
+		
 
 		
 	}
