@@ -223,7 +223,7 @@ public class UserGUI{ //extends Client implements ActionListener{
 					} else if (cipher.contains("Stream Cipher")) {
 						 KeyGenerator key;
 						try {
-							key = KeyGenerator.getInstance("CFB");
+							key = KeyGenerator.getInstance("AES");
 							key.init(256);
 							streamKey = key.generateKey();
 							String keyString = Base64.getEncoder().encodeToString(streamKey.getEncoded());
@@ -385,7 +385,7 @@ public class UserGUI{ //extends Client implements ActionListener{
 					{
 				      
 				        try {
-					        Cipher cipher = Cipher.getInstance("AES");
+					        Cipher cipher = Cipher.getInstance("AES/CFB8/NoPadding");
 					        byte[] byteText = plainText.getBytes();
 					        cipher.init(Cipher.ENCRYPT_MODE, blockKey);
 					        byte[] byteCipherText = cipher.doFinal(byteText);
