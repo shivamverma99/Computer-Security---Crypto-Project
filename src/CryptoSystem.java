@@ -243,94 +243,53 @@ public class CryptoSystem{
 							if (threadName[victimCounter].contains(clients[i].victim))
 								break;
 						}
-						if (clients[i].mode.contains("Chosen Plaintext")) {
-							String ctOracle = clients[i].ctGuess;
-							String ptOracle;
-							if (clients[victimCounter].cipher.contains("RSA")) {
-								decryptedOracle = RSA.decrypt(clients[victimCounter].key.getBytes(), ctOracle.getBytes());
-								ptOracle = decryptedOracle.toString();
-								clients[i].setIncomingMessage(("The plaintext is: " + ptOracle + "For the requested ciphertext: " + ctOracle), "CryptoSystem");
-							} else if (clients[victimCounter].cipher.contains("Stream Cipher")) {
-								byte[] cipherText = Base64.getEncoder().encode(ctOracle.getBytes());
-						        Cipher cipher = Cipher.getInstance("CFB");
-						        byte[] decodedKey = Base64.getDecoder().decode(clients[victimCounter].key);
-						        SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "CFB");
-						        cipher.init(Cipher.DECRYPT_MODE, secretKey);
-						        decryptedOracle = cipher.doFinal(cipherText);
-								ptOracle = decryptedOracle.toString();
-								clients[i].setIncomingMessage(("The plaintext is: " + ptOracle + "For the requested ciphertext: " + ctOracle), "CryptoSystem");
-							} else if (clients[victimCounter].cipher.contains("Block Cipher")) {
-								byte[] cipherText = Base64.getEncoder().encode(ctOracle.getBytes());
-						        Cipher cipher = Cipher.getInstance("AES");
-						        byte[] decodedKey = Base64.getDecoder().decode(clients[victimCounter].key);
-						        SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");
-						        cipher.init(Cipher.DECRYPT_MODE, secretKey);
-						        decryptedOracle = cipher.doFinal(cipherText);
-								ptOracle = decryptedOracle.toString();
-								clients[i].setIncomingMessage(("The plaintext is: " + ptOracle + "For the requested ciphertext: " + ctOracle), "CryptoSystem");
-							} else if (clients[victimCounter].cipher.contains("Monoalphabetic")) {
-								ptOracle = MonoCipher.decrypt(ctOracle);
-								clients[i].setIncomingMessage(("The plaintext is: " + ptOracle + "For the requested ciphertext: " + ctOracle), "CryptoSystem");
-							} else if (clients[victimCounter].cipher.contains("Vigenere")) {
-								ptOracle = VigenereCipher.decrypt(ctOracle, clients[victimCounter].key);
-								clients[i].setIncomingMessage(("The plaintext is: " + ptOracle + "For the requested ciphertext: " + ctOracle), "CryptoSystem");
-							} else if (clients[victimCounter].cipher.contains("Hill Cipher")) {
-								ptOracle = HillCipher.decrypt(clients[victimCounter].key, ctOracle);
-								clients[i].setIncomingMessage(("The plaintext is: " + ptOracle + "For the requested ciphertext: " + ctOracle), "CryptoSystem");
-							}
-							txtOutput.append("Attacker has gotten information from the oracle of the type Chosen Plaintext\n");
-							
-						} else if (clients[i].mode.contains("Chosen Ciphertext")) {
-							String ptOracle = clients[i].oraclePT;
-							String ctOracle;
-							if (clients[victimCounter].cipher.contains("RSA")) {
-								encryptedOracle = RSA.encrypt(clients[victimCounter].key.getBytes(), ptOracle.getBytes());
-								ctOracle = encryptedOracle.toString();
-								clients[i].setIncomingMessage(("The ciphertext is: " + ctOracle + "For the requested plaintext: " + ptOracle), "CryptoSystem");
-							} else if (clients[victimCounter].cipher.contains("Stream Cipher")) {
-								KeyGenerator key = KeyGenerator.getInstance("CFB"); 
-						        key.init(256);
-						        byte[] decodedKey = Base64.getDecoder().decode(clients[victimCounter].key);
-						        SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "CFB");									        
-						        Cipher cipher = Cipher.getInstance("CFB");
-						        byte[] byteText = ptOracle.getBytes();
-						        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-						        byte[] byteCipherText = cipher.doFinal(byteText);
-						        ctOracle = byteCipherText.toString();
-								clients[i].setIncomingMessage(("The ciphertext is: " + ctOracle + "For the requested plaintext: " + ptOracle), "CryptoSystem");
-							} else if (clients[victimCounter].cipher.contains("Block Cipher")) {
-								KeyGenerator key = KeyGenerator.getInstance("AES"); 
-						        key.init(256);
-						        byte[] decodedKey = Base64.getDecoder().decode(clients[victimCounter].key);
-						        SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");									        
-						        Cipher cipher = Cipher.getInstance("AES");
-						        byte[] byteText = ptOracle.getBytes();
-						        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-						        byte[] byteCipherText = cipher.doFinal(byteText);
-						        ctOracle = byteCipherText.toString();
-								clients[i].setIncomingMessage(("The ciphertext is: " + ctOracle + "For the requested plaintext: " + ptOracle), "CryptoSystem");
-							} else if (clients[victimCounter].cipher.contains("Monoalphabetic")) {
-								ctOracle = MonoCipher.encrypt(ptOracle);
-								clients[i].setIncomingMessage(("The ciphertext is: " + ctOracle + "For the requested plaintext: " + ptOracle), "CryptoSystem");
-							} else if (clients[victimCounter].cipher.contains("Vigenere")) {
-								ctOracle = VigenereCipher.decrypt(ptOracle, clients[victimCounter].key);
-								clients[i].setIncomingMessage(("The ciphertext is: " + ctOracle + "For the requested plaintext: " + ptOracle), "CryptoSystem");
-							} else if (clients[victimCounter].cipher.contains("Hill Cipher")) {
-								ctOracle = HillCipher.encrypt(clients[victimCounter].key, ptOracle);
-								clients[i].setIncomingMessage(("The ciphertext is: " + ctOracle + "For the requested plaintext: " + ptOracle), "CryptoSystem");
-							}
-							txtOutput.append("Attacker has gotten information from the oracle of the type Chosen Ciphertext\n");
-							
-						} else if (clients[i].mode.contains("Known Plaintext")) {
-							String[] pts = {"Hey there", "My name is", "The zebra walked across the xylophone", "Betty tried to win the game", "Camels can swim when it is hot",
-									        "Do not open that door", "Sphinx of black quartz judge my vow", "Jackdaws love my big sphinx of quartz", "Pack my box with five dozen liquor jugs"};
-							String[] cts = new String[pts.length];
-							for (int j = 0; i < pts.length; i++) {
-								String ptOracle = pts[j];
+						if (!clients[victimCounter].cipherEnabled) {
+							clients[i].setIncomingMessage("Victim has not chosen a cipher yet, please wait and then try again", "CryptoSystem");
+						} else {
+							if (clients[i].mode.contains("Chosen Plaintext")) {
+								String ctOracle = clients[i].ctGuess;
+								String ptOracle;
+								if (clients[victimCounter].cipher.contains("RSA")) {
+									decryptedOracle = RSA.decrypt(clients[victimCounter].key.getBytes(), ctOracle.getBytes());
+									ptOracle = decryptedOracle.toString();
+									clients[i].setIncomingMessage(("The plaintext is: " + ptOracle + "For the requested ciphertext: " + ctOracle), "CryptoSystem");
+								} else if (clients[victimCounter].cipher.contains("Stream Cipher")) {
+									byte[] cipherText = Base64.getEncoder().encode(ctOracle.getBytes());
+							        Cipher cipher = Cipher.getInstance("CFB");
+							        byte[] decodedKey = Base64.getDecoder().decode(clients[victimCounter].key);
+							        SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "CFB");
+							        cipher.init(Cipher.DECRYPT_MODE, secretKey);
+							        decryptedOracle = cipher.doFinal(cipherText);
+									ptOracle = decryptedOracle.toString();
+									clients[i].setIncomingMessage(("The plaintext is: " + ptOracle + "For the requested ciphertext: " + ctOracle), "CryptoSystem");
+								} else if (clients[victimCounter].cipher.contains("Block Cipher")) {
+									byte[] cipherText = Base64.getEncoder().encode(ctOracle.getBytes());
+							        Cipher cipher = Cipher.getInstance("AES");
+							        byte[] decodedKey = Base64.getDecoder().decode(clients[victimCounter].key);
+							        SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");
+							        cipher.init(Cipher.DECRYPT_MODE, secretKey);
+							        decryptedOracle = cipher.doFinal(cipherText);
+									ptOracle = decryptedOracle.toString();
+									clients[i].setIncomingMessage(("The plaintext is: " + ptOracle + "For the requested ciphertext: " + ctOracle), "CryptoSystem");
+								} else if (clients[victimCounter].cipher.contains("Monoalphabetic")) {
+									ptOracle = MonoCipher.decrypt(ctOracle);
+									clients[i].setIncomingMessage(("The plaintext is: " + ptOracle + "For the requested ciphertext: " + ctOracle), "CryptoSystem");
+								} else if (clients[victimCounter].cipher.contains("Vigenere")) {
+									ptOracle = VigenereCipher.decrypt(ctOracle, clients[victimCounter].key);
+									clients[i].setIncomingMessage(("The plaintext is: " + ptOracle + "For the requested ciphertext: " + ctOracle), "CryptoSystem");
+								} else if (clients[victimCounter].cipher.contains("Hill Cipher")) {
+									ptOracle = HillCipher.decrypt(clients[victimCounter].key, ctOracle);
+									clients[i].setIncomingMessage(("The plaintext is: " + ptOracle + "For the requested ciphertext: " + ctOracle), "CryptoSystem");
+								}
+								txtOutput.append("Attacker has gotten information from the oracle of the type Chosen Plaintext\n");
+								
+							} else if (clients[i].mode.contains("Chosen Ciphertext")) {
+								String ptOracle = clients[i].oraclePT;
+								String ctOracle;
 								if (clients[victimCounter].cipher.contains("RSA")) {
 									encryptedOracle = RSA.encrypt(clients[victimCounter].key.getBytes(), ptOracle.getBytes());
-									cts[j] = encryptedOracle.toString();
-									clients[i].setIncomingMessage(("The ciphertext is: " + cts[j] + "For the given plaintext: " + ptOracle), "CryptoSystem");
+									ctOracle = encryptedOracle.toString();
+									clients[i].setIncomingMessage(("The ciphertext is: " + ctOracle + "For the requested plaintext: " + ptOracle), "CryptoSystem");
 								} else if (clients[victimCounter].cipher.contains("Stream Cipher")) {
 									KeyGenerator key = KeyGenerator.getInstance("CFB"); 
 							        key.init(256);
@@ -340,8 +299,8 @@ public class CryptoSystem{
 							        byte[] byteText = ptOracle.getBytes();
 							        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
 							        byte[] byteCipherText = cipher.doFinal(byteText);
-							        cts[j] = byteCipherText.toString();
-									clients[i].setIncomingMessage(("The ciphertext is: " + cts[j] + "For the given plaintext: " + ptOracle), "CryptoSystem");
+							        ctOracle = byteCipherText.toString();
+									clients[i].setIncomingMessage(("The ciphertext is: " + ctOracle + "For the requested plaintext: " + ptOracle), "CryptoSystem");
 								} else if (clients[victimCounter].cipher.contains("Block Cipher")) {
 									KeyGenerator key = KeyGenerator.getInstance("AES"); 
 							        key.init(256);
@@ -351,68 +310,113 @@ public class CryptoSystem{
 							        byte[] byteText = ptOracle.getBytes();
 							        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
 							        byte[] byteCipherText = cipher.doFinal(byteText);
-							        cts[j] = byteCipherText.toString();
-									clients[i].setIncomingMessage(("The ciphertext is: " + cts[j] + "For the given plaintext: " + ptOracle), "CryptoSystem");
+							        ctOracle = byteCipherText.toString();
+									clients[i].setIncomingMessage(("The ciphertext is: " + ctOracle + "For the requested plaintext: " + ptOracle), "CryptoSystem");
 								} else if (clients[victimCounter].cipher.contains("Monoalphabetic")) {
-									cts[j] = MonoCipher.encrypt(ptOracle);
-									clients[i].setIncomingMessage(("The ciphertext is: " + cts[j] + "For the given plaintext: " + ptOracle), "CryptoSystem");
+									ctOracle = MonoCipher.encrypt(ptOracle);
+									clients[i].setIncomingMessage(("The ciphertext is: " + ctOracle + "For the requested plaintext: " + ptOracle), "CryptoSystem");
 								} else if (clients[victimCounter].cipher.contains("Vigenere")) {
-									cts[j] = VigenereCipher.decrypt(ptOracle, clients[victimCounter].key);
-									clients[i].setIncomingMessage(("The ciphertext is: " + cts[j] + "For the given plaintext: " + ptOracle), "CryptoSystem");
+									ctOracle = VigenereCipher.decrypt(ptOracle, clients[victimCounter].key);
+									clients[i].setIncomingMessage(("The ciphertext is: " + ctOracle + "For the requested plaintext: " + ptOracle), "CryptoSystem");
 								} else if (clients[victimCounter].cipher.contains("Hill Cipher")) {
-									cts[j] = HillCipher.encrypt(clients[victimCounter].key, ptOracle);
-									clients[i].setIncomingMessage(("The ciphertext is: " + cts[j] + "For the given plaintext: " + ptOracle), "CryptoSystem");
+									ctOracle = HillCipher.encrypt(clients[victimCounter].key, ptOracle);
+									clients[i].setIncomingMessage(("The ciphertext is: " + ctOracle + "For the requested plaintext: " + ptOracle), "CryptoSystem");
 								}
-							}
-							txtOutput.append("Attacker has gotten information from the oracle of the type Known Plaintext\n");
-
-							
-						} else if (clients[i].mode.contains("Ciphertext Only")) {
-							String[] pts = {"Hey there", "My name is", "The zebra walked across the xylophone", "Betty tried to win the game", "Camels can swim when it is hot",
-							        "Do not open that door", "Sphinx of black quartz judge my vow", "Jackdaws love my big sphinx of quartz", "Pack my box with five dozen liquor jugs"};
-							String[] cts = new String[pts.length];
-							for (int j = 0; i < pts.length; i++) {
-								String ptOracle = pts[j];
-								if (clients[victimCounter].cipher.contains("RSA")) {
-									encryptedOracle = RSA.encrypt(clients[victimCounter].key.getBytes(), ptOracle.getBytes());
-									cts[j] = encryptedOracle.toString();
-									clients[i].setIncomingMessage(("The ciphertext is: " + cts[j]), "CryptoSystem");
-								} else if (clients[victimCounter].cipher.contains("Stream Cipher")) {
-									KeyGenerator key = KeyGenerator.getInstance("CFB"); 
-							        key.init(256);
-							        byte[] decodedKey = Base64.getDecoder().decode(clients[victimCounter].key);
-							        SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "CFB");									        
-							        Cipher cipher = Cipher.getInstance("CFB");
-							        byte[] byteText = ptOracle.getBytes();
-							        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-							        byte[] byteCipherText = cipher.doFinal(byteText);
-							        cts[j] = byteCipherText.toString();
-									clients[i].setIncomingMessage(("The ciphertext is: " + cts[j]), "CryptoSystem");
-								} else if (clients[victimCounter].cipher.contains("Block Cipher")) {
-									KeyGenerator key = KeyGenerator.getInstance("AES"); 
-							        key.init(256);
-							        byte[] decodedKey = Base64.getDecoder().decode(clients[victimCounter].key);
-							        SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");									        
-							        Cipher cipher = Cipher.getInstance("AES");
-							        byte[] byteText = ptOracle.getBytes();
-							        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-							        byte[] byteCipherText = cipher.doFinal(byteText);
-							        cts[j] = byteCipherText.toString();
-									clients[i].setIncomingMessage(("The ciphertext is: " + cts[j]), "CryptoSystem");
-								} else if (clients[victimCounter].cipher.contains("Monoalphabetic")) {
-									cts[j] = MonoCipher.encrypt(ptOracle);
-									clients[i].setIncomingMessage(("The ciphertext is: " + cts[j]), "CryptoSystem");
-								} else if (clients[victimCounter].cipher.contains("Vigenere")) {
-									cts[j] = VigenereCipher.decrypt(ptOracle, clients[victimCounter].key);
-									clients[i].setIncomingMessage(("The ciphertext is: " + cts[j]), "CryptoSystem");
-								} else if (clients[victimCounter].cipher.contains("Hill Cipher")) {
-									cts[j] = HillCipher.encrypt(clients[victimCounter].key, ptOracle);
-									clients[i].setIncomingMessage(("The ciphertext is: " + cts[j]), "CryptoSystem");
+								txtOutput.append("Attacker has gotten information from the oracle of the type Chosen Ciphertext\n");
+								
+							} else if (clients[i].mode.contains("Known Plaintext")) {
+								String[] pts = {"Hey there", "My name is", "The zebra walked across the xylophone", "Betty tried to win the game", "Camels can swim when it is hot",
+										        "Do not open that door", "Sphinx of black quartz judge my vow", "Jackdaws love my big sphinx of quartz", "Pack my box with five dozen liquor jugs"};
+								String[] cts = new String[pts.length];
+								for (int j = 0; i < pts.length; i++) {
+									String ptOracle = pts[j];
+									if (clients[victimCounter].cipher.contains("RSA")) {
+										encryptedOracle = RSA.encrypt(clients[victimCounter].key.getBytes(), ptOracle.getBytes());
+										cts[j] = encryptedOracle.toString();
+										clients[i].setIncomingMessage(("The ciphertext is: " + cts[j] + "For the given plaintext: " + ptOracle), "CryptoSystem");
+									} else if (clients[victimCounter].cipher.contains("Stream Cipher")) {
+										KeyGenerator key = KeyGenerator.getInstance("CFB"); 
+								        key.init(256);
+								        byte[] decodedKey = Base64.getDecoder().decode(clients[victimCounter].key);
+								        SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "CFB");									        
+								        Cipher cipher = Cipher.getInstance("CFB");
+								        byte[] byteText = ptOracle.getBytes();
+								        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+								        byte[] byteCipherText = cipher.doFinal(byteText);
+								        cts[j] = byteCipherText.toString();
+										clients[i].setIncomingMessage(("The ciphertext is: " + cts[j] + "For the given plaintext: " + ptOracle), "CryptoSystem");
+									} else if (clients[victimCounter].cipher.contains("Block Cipher")) {
+										KeyGenerator key = KeyGenerator.getInstance("AES"); 
+								        key.init(256);
+								        byte[] decodedKey = Base64.getDecoder().decode(clients[victimCounter].key);
+								        SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");									        
+								        Cipher cipher = Cipher.getInstance("AES");
+								        byte[] byteText = ptOracle.getBytes();
+								        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+								        byte[] byteCipherText = cipher.doFinal(byteText);
+								        cts[j] = byteCipherText.toString();
+										clients[i].setIncomingMessage(("The ciphertext is: " + cts[j] + "For the given plaintext: " + ptOracle), "CryptoSystem");
+									} else if (clients[victimCounter].cipher.contains("Monoalphabetic")) {
+										cts[j] = MonoCipher.encrypt(ptOracle);
+										clients[i].setIncomingMessage(("The ciphertext is: " + cts[j] + "For the given plaintext: " + ptOracle), "CryptoSystem");
+									} else if (clients[victimCounter].cipher.contains("Vigenere")) {
+										cts[j] = VigenereCipher.decrypt(ptOracle, clients[victimCounter].key);
+										clients[i].setIncomingMessage(("The ciphertext is: " + cts[j] + "For the given plaintext: " + ptOracle), "CryptoSystem");
+									} else if (clients[victimCounter].cipher.contains("Hill Cipher")) {
+										cts[j] = HillCipher.encrypt(clients[victimCounter].key, ptOracle);
+										clients[i].setIncomingMessage(("The ciphertext is: " + cts[j] + "For the given plaintext: " + ptOracle), "CryptoSystem");
+									}
 								}
+								txtOutput.append("Attacker has gotten information from the oracle of the type Known Plaintext\n");
+	
+								
+							} else if (clients[i].mode.contains("Ciphertext Only")) {
+								String[] pts = {"Hey there", "My name is", "The zebra walked across the xylophone", "Betty tried to win the game", "Camels can swim when it is hot",
+								        "Do not open that door", "Sphinx of black quartz judge my vow", "Jackdaws love my big sphinx of quartz", "Pack my box with five dozen liquor jugs"};
+								String[] cts = new String[pts.length];
+								for (int j = 0; i < pts.length; i++) {
+									String ptOracle = pts[j];
+									if (clients[victimCounter].cipher.contains("RSA")) {
+										encryptedOracle = RSA.encrypt(clients[victimCounter].key.getBytes(), ptOracle.getBytes());
+										cts[j] = encryptedOracle.toString();
+										clients[i].setIncomingMessage(("The ciphertext is: " + cts[j]), "CryptoSystem");
+									} else if (clients[victimCounter].cipher.contains("Stream Cipher")) {
+										KeyGenerator key = KeyGenerator.getInstance("CFB"); 
+								        key.init(256);
+								        byte[] decodedKey = Base64.getDecoder().decode(clients[victimCounter].key);
+								        SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "CFB");									        
+								        Cipher cipher = Cipher.getInstance("CFB");
+								        byte[] byteText = ptOracle.getBytes();
+								        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+								        byte[] byteCipherText = cipher.doFinal(byteText);
+								        cts[j] = byteCipherText.toString();
+										clients[i].setIncomingMessage(("The ciphertext is: " + cts[j]), "CryptoSystem");
+									} else if (clients[victimCounter].cipher.contains("Block Cipher")) {
+										KeyGenerator key = KeyGenerator.getInstance("AES"); 
+								        key.init(256);
+								        byte[] decodedKey = Base64.getDecoder().decode(clients[victimCounter].key);
+								        SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");									        
+								        Cipher cipher = Cipher.getInstance("AES");
+								        byte[] byteText = ptOracle.getBytes();
+								        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+								        byte[] byteCipherText = cipher.doFinal(byteText);
+								        cts[j] = byteCipherText.toString();
+										clients[i].setIncomingMessage(("The ciphertext is: " + cts[j]), "CryptoSystem");
+									} else if (clients[victimCounter].cipher.contains("Monoalphabetic")) {
+										cts[j] = MonoCipher.encrypt(ptOracle);
+										clients[i].setIncomingMessage(("The ciphertext is: " + cts[j]), "CryptoSystem");
+									} else if (clients[victimCounter].cipher.contains("Vigenere")) {
+										cts[j] = VigenereCipher.decrypt(ptOracle, clients[victimCounter].key);
+										clients[i].setIncomingMessage(("The ciphertext is: " + cts[j]), "CryptoSystem");
+									} else if (clients[victimCounter].cipher.contains("Hill Cipher")) {
+										cts[j] = HillCipher.encrypt(clients[victimCounter].key, ptOracle);
+										clients[i].setIncomingMessage(("The ciphertext is: " + cts[j]), "CryptoSystem");
+									}
+								}
+								txtOutput.append("Attacker has gotten information from the oracle of the type Ciphertext Only\n");
 							}
-							txtOutput.append("Attacker has gotten information from the oracle of the type Ciphertext Only\n");
+							clients[i].alertAttackerOracle = false;
 						}
-						clients[i].alertAttackerOracle = false;
 					} 
 				}
 				try {

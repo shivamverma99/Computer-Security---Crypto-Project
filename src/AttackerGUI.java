@@ -33,8 +33,8 @@ public class AttackerGUI {
     PrintWriter pwSock; //For the socket I/O
     BufferedReader br;
     private JTextField textField_3;
-    String name;
-    boolean connected;
+    String name, mode;
+    boolean connected, attackMode = false, victimSelected = false;
 
     /**
      * Launch the application.
@@ -113,7 +113,7 @@ public class AttackerGUI {
         frame.getContentPane().add(inputLbl);
 
         JTextField input = new JTextField();
-        input.setBounds(148, 150, 150, 20);
+        input.setBounds(107, 153, 150, 20);
         frame.getContentPane().add(input);
         input.setColumns(10);
 
@@ -178,12 +178,39 @@ public class AttackerGUI {
         JButton btnChoose = new JButton("Choose");
         btnChoose.setBounds(209, 90, 89, 23);
         frame.getContentPane().add(btnChoose);
+        
+        JButton btnAskOracle = new JButton("Ask Oracle");
+        btnAskOracle.setBounds(268, 149, 89, 23);
+        frame.getContentPane().add(btnAskOracle);
+        btnAskOracle.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if (!attackMode) {
+					serverOutput.append("First choose an attacker mode\n");
+				} else {
+					String oracleText = input.getText();
+					if (!(oracleText.length() > 0)) {
+						serverOutput.append("Please type what to send to the oracle first.");
+					} else {
+						if (mode.contains("Chosen Ciphertext")) {
+							pwSock.println("Oracle," + oracleText);
+						} else if (mode.contains("Chosen Plaintext")) {
+							pwSock.println("Oracle," + oracleText);
+						}
+					}
+				}
+			}
+        	
+        });
+        
         btnChoose.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				String victim = (String)comboBox_1.getSelectedItem();
+				victimSelected = true;
 				pwSock.println("Conversation," + victim);
 			}
         	
@@ -235,26 +262,44 @@ public class AttackerGUI {
         freqButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                serverOutput.setText(Attacker.frequencyAnalysis());
+                //serverOutput.setText(Attacker.frequencyAnalysis());
+                pwSock.println("Tool,Frequency Analysis");
             }
         });
         attackButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (comboBox.getSelectedItem().equals("Ciphertext-Only:")) {
-                    //simply print out any ciphertext given by server
-                    serverOutput.setText(Attacker.ciphertextOnly());
-                } else if (comboBox.getSelectedItem().equals("Known-Plaintext: ")) {
-                    serverOutput.setText(Attacker.knownPlaintext());
-                } else if (comboBox.getSelectedItem().equals("Chosen-Ciphertext")) {
-                    serverOutput.setText(Attacker.chosenCiphertext(input.getText()));
-                } else if (comboBox.getSelectedItem().equals("Chosen-Plaintext: ")) {
-                    serverOutput.setText(Attacker.chosenPlaintext(input.getText()));
-                }
+            	if (!victimSelected) {
+            		serverOutput.append("Please choose a victim(conversation) to listen to first");
+            	} else {
+	            	attackMode = true;
+	                if (comboBox.getSelectedItem().equals("Ciphertext-Only:")) {
+	                    //simply print out any ciphertext given by server
+	                	mode = "Ciphertext Only";
+	                	input.setEnabled(false);
+	                    //serverOutput.setText(Attacker.ciphertextOnly());
+	                    pwSock.println("Mode,Ciphertext Only");
+	                } else if (comboBox.getSelectedItem().equals("Known-Plaintext: ")) {
+	                	mode = "Known Plaintext";
+	                	input.setEnabled(false);
+	                    //serverOutput.setText(Attacker.knownPlaintext());
+	                    pwSock.println("Mode,Known Plaintext");
+	                } else if (comboBox.getSelectedItem().equals("Chosen-Ciphertext")) {
+	                	mode = "Chosen Ciphertext";	
+	                    //serverOutput.setText(Attacker.chosenCiphertext(input.getText()));
+	                    pwSock.println("Mode,Chosen Ciphertext");
+	                	
+	                } else if (comboBox.getSelectedItem().equals("Chosen-Plaintext: ")) {
+	                	mode = "Chosen Plaintext";
+	                	pwSock.println("Mode,Chosen Plaintext");
+	                    //serverOutput.setText(Attacker.chosenPlaintext(input.getText()));
+	                	
+	                }
+            	}
             }
         });
         guessButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                serverOutput.setText(Attacker.guess(guessArea.getText()));
+                //serverOutput.setText(Attacker.guess(guessArea.getText()));
             }
         });
 
