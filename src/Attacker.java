@@ -248,7 +248,7 @@ public class Attacker {
 		//PRINT LETTERS AND CORRESPONDING CIPHER VALUE
 		String s = "";
 		for (i = 0; i < 26; i++) {
-			s += freqCipher[i] + " = " + freqChar[i] + "||";
+			s += freqCipher[i] + " = " + freqChar[i] + "\n";
 		}
 		return s;
 	}
