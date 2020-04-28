@@ -5,6 +5,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import java.awt.BorderLayout;
 import javax.swing.JTextField;
+import javax.swing.Timer;
 
 import java.awt.GridLayout;
 import java.awt.GridBagLayout;
@@ -31,6 +32,9 @@ public class AttackerGUI {
     Socket sock;
     PrintWriter pwSock; //For the socket I/O
     BufferedReader br;
+    private JTextField textField_3;
+    String name;
+    boolean connected;
 
     /**
      * Launch the application.
@@ -66,55 +70,55 @@ public class AttackerGUI {
         frame.getContentPane().setLayout(null);
 
         JLabel lblNewLabel = new JLabel("System IP: ");
-        lblNewLabel.setBounds(10, 11, 76, 21);
+        lblNewLabel.setBounds(10, 36, 76, 21);
         frame.getContentPane().add(lblNewLabel);
 
         JLabel lblNewLabel_1 = new JLabel("System Port:");
-        lblNewLabel_1.setBounds(10, 36, 87, 14);
+        lblNewLabel_1.setBounds(10, 68, 87, 14);
         frame.getContentPane().add(lblNewLabel_1);
 
         JTextField textField_1 = new JTextField();
-        textField_1.setBounds(79, 11, 99, 20);
+        textField_1.setBounds(71, 36, 99, 20);
         frame.getContentPane().add(textField_1);
         textField_1.setColumns(10);
 
         JTextField textField_2 = new JTextField();
-        textField_2.setBounds(89, 33, 42, 20);
+        textField_2.setBounds(107, 65, 42, 20);
         frame.getContentPane().add(textField_2);
         textField_2.setColumns(10);
 
         JButton connectBtn = new JButton("Connect");
-        connectBtn.setBounds(225, 10, 89, 23);
+        connectBtn.setBounds(225, 48, 89, 23);
         frame.getContentPane().add(connectBtn);
 
         JLabel lblNewLabel_2 = new JLabel("Attacker Mode:");
-        lblNewLabel_2.setBounds(10, 79, 99, 14);
+        lblNewLabel_2.setBounds(10, 128, 99, 14);
         frame.getContentPane().add(lblNewLabel_2);
 
         JComboBox comboBox = new JComboBox();
         comboBox.setModel(new DefaultComboBoxModel(new String[]{"Ciphertext-Only:", "Known-Plaintext: ", "Chosen-Ciphertext", "Chosen-Plaintext: "}));
         comboBox.setSelectedIndex(0);
         comboBox.setToolTipText("dads\r\n");
-        comboBox.setBounds(102, 75, 129, 22);
+        comboBox.setBounds(100, 124, 129, 22);
         frame.getContentPane().add(comboBox);
         lblNewLabel_3.setBounds(114, -40, 148, 40);
         frame.getContentPane().add(lblNewLabel_3);
 
         JButton attackButton = new JButton("Attack");
-        attackButton.setBounds(258, 75, 89, 23);
+        attackButton.setBounds(258, 124, 89, 23);
         frame.getContentPane().add(attackButton);
 
         JLabel inputLbl = new JLabel("Chosen Text:");
-        inputLbl.setBounds(10, 117, 160, 14);
+        inputLbl.setBounds(10, 153, 160, 14);
         frame.getContentPane().add(inputLbl);
 
         JTextField input = new JTextField();
-        input.setBounds(150, 114, 150, 20);
+        input.setBounds(148, 150, 150, 20);
         frame.getContentPane().add(input);
         input.setColumns(10);
 
         JLabel lblNewLabel_5 = new JLabel("Tool Kit");
-        lblNewLabel_5.setBounds(10, 160, 76, 14);
+        lblNewLabel_5.setBounds(10, 178, 76, 14);
         frame.getContentPane().add(lblNewLabel_5);
 
         //JComboBox comboBox_1 = new JComboBox();
@@ -123,7 +127,7 @@ public class AttackerGUI {
         //frame.getContentPane().add(comboBox_1);
 
         JButton freqButton = new JButton("Frequency Analysis");
-        freqButton.setBounds(100, 156, 200, 21);
+        freqButton.setBounds(100, 175, 200, 21);
         frame.getContentPane().add(freqButton);
 
         JLabel lblNewLabel_6 = new JLabel("Toolbox Data:");
@@ -153,6 +157,37 @@ public class AttackerGUI {
         JButton guessButton = new JButton("Guess");
         guessButton.setBounds(130, 620, 81, 25);
         frame.getContentPane().add(guessButton);
+        
+        JLabel lblEnterNameHere = new JLabel("Enter Name Here:");
+        lblEnterNameHere.setBounds(10, 11, 121, 14);
+        frame.getContentPane().add(lblEnterNameHere);
+        
+        textField_3 = new JTextField();
+        textField_3.setBounds(124, 8, 86, 20);
+        frame.getContentPane().add(textField_3);
+        textField_3.setColumns(10);
+        
+        JLabel lblChooseVictim = new JLabel("Choose Victim");
+        lblChooseVictim.setBounds(10, 93, 87, 14);
+        frame.getContentPane().add(lblChooseVictim);
+        
+        JComboBox comboBox_1 = new JComboBox();
+        comboBox_1.setBounds(91, 93, 99, 20);
+        frame.getContentPane().add(comboBox_1);
+        
+        JButton btnChoose = new JButton("Choose");
+        btnChoose.setBounds(209, 90, 89, 23);
+        frame.getContentPane().add(btnChoose);
+        btnChoose.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				String victim = (String)comboBox_1.getSelectedItem();
+				pwSock.println("Conversation," + victim);
+			}
+        	
+        });
 
         //TODO: work out spacing between fields and buttons
         //label for info given by server (such as plaintext received)
@@ -168,17 +203,31 @@ public class AttackerGUI {
         connectBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (e.getActionCommand().equals("Connect")) {
-                    try {
-                        int port = Integer.parseInt(textField_1.getText());
-                        br = new BufferedReader(new InputStreamReader(sock.getInputStream()));
-                        pwSock = new PrintWriter(sock.getOutputStream(), true);
-                        //Attacker.Client(ip,port,data)
-                        //Client c = new Client(textField_1.getText(), port);
-                        Attacker.Client(textField_1.getText(),port,"");
+                	if (!(textField_3.getText().length() > 0)) {
+						serverOutput.append("First enter a name, then connect\n");
+					} else {
+						try {
+
+							name = textField_3.getText();
+							int port = Integer.parseInt(textField_2.getText());
+							sock = new Socket(textField_1.getText(), port); 
+							br = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+							pwSock = new PrintWriter(sock.getOutputStream(), true);
+							pwSock.println("Attacker," + name);
+							//String response = br.readLine();
+							//textArea_1.append(response + "\n");
+							connectBtn.setEnabled(false);;
+							connected = true;
+	                        br = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+	                        pwSock = new PrintWriter(sock.getOutputStream(), true);
+	                        //Attacker.Client(ip,port,data)
+	                        //Client c = new Client(textField_1.getText(), port);
+	                        //Attacker.Client(textField_1.getText(),port,"");
                     } catch (Exception ex) {
-                        textArea.append("Error: " + ex);
+                        serverOutput.append("Error: " + ex + "\n");
                     }
                 }
+            }
             }
         });
 
@@ -210,6 +259,32 @@ public class AttackerGUI {
         });
 
 
+        ActionListener refresh = new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				try {
+					if (connected && br.ready()) {
+						String response = br.readLine();
+						if (response.contains("New Entrant") || response.contains("Currently in")) {
+							response = response.substring(response.indexOf(',') + 1);
+							comboBox_1.addItem(response);
+						} else {
+							serverOutput.append(response + "\n");
+						}
+					}
+					
+				} catch (Exception e1) {
+					System.out.println("Error Here" + e1);
+			}
+		}
+			
+	};
+		Timer st = new Timer(1000, refresh);
+		st.setRepeats(true);
+		st.start();
+		
 
 	/*public static void main(String[] args) {
 

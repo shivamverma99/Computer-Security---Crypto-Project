@@ -433,13 +433,18 @@ public class CryptoSystem{
 
 						if (threadCounter > 0) {
 							for (int i = 0; i <= threadCounter; i++) {
-								if (clients[threadCounter].type != "Attacker" && i != threadCounter)
+								if (!(clients[threadCounter].type.contains("Attacker")) && i != threadCounter)
 									clients[i].setIncomingMessage("New Entrant," + clients[threadCounter].name, "CryptoSystem");
-								if (i == threadCounter) {
+								if (i == threadCounter && clients[i].type.contains("Attacker")) {
 									for (int j = 0; j < threadCounter; j++) {
-										clients[i].setIncomingMessage("Currently in chat," + clients[j].name, "CryptoSystem");
+											clients[i].setIncomingMessage("Currently in chat," + clients[j].name, "CryptoSystem");
 									}
+								} else if (i == threadCounter && clients[i].type.contains("User")) {
+									for (int j = 0; j < threadCounter; j++) {
+										if (!(clients[j].type.contains("Attacker")))
+										clients[i].setIncomingMessage("Currently in chat," + clients[j].name, "CryptoSystem");
 								}
+								} 
 							}
 						}
 						if (clients[threadCounter].type == "Attacker") {
