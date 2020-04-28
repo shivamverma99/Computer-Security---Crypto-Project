@@ -8,7 +8,7 @@ class ServerThread extends Thread{
 	PrintWriter pwSock; //For the socket I/O
 	BufferedReader br;
 	String name;
-	boolean alertUser = false, alertAttackerGuess = false, alertAttackerOracle = false, abort = false;
+	boolean alertUser = false, alertAttackerGuess = false, alertAttackerOracle = false, abort = false, cipherEnabled;
 	String sender, type, dataType, message, cipher, tool, mode, ptGuess, ctGuess, victim, conversation, key, oraclePT, oracleCT;
 	String[] destinations, cipherText = new String[100], plainText = new String[100];
 	int numDest, messageCounter = 0, guessCounter = -1, temp = 1;
@@ -52,6 +52,7 @@ class ServerThread extends Thread{
 						dataType = fullMessage.substring(0, fullMessage.indexOf(','));
 						fullMessage = fullMessage.substring(fullMessage.indexOf(',') + 1);
 						if (dataType.contains("Cipher")) { //Depending on which cipher it is, will get the key then 
+							cipherEnabled = true;
 							if (fullMessage.contains("RSA")) {
 								cipher = fullMessage.substring(0, fullMessage.indexOf(','));
 								fullMessage = fullMessage.substring(fullMessage.indexOf(',') + 1);

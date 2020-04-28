@@ -18,6 +18,7 @@ import java.awt.FlowLayout;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
@@ -25,6 +26,7 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
@@ -80,7 +82,10 @@ public class CryptoSystem{
 		txtChatMembers = new JTextArea();
 		txtChatMembers.setBounds(10, 192, 110, 109);
 		txtChatMembers.setEditable(false);
+		JScrollPane scroll = new JScrollPane(txtChatMembers);
+	    scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		frame.getContentPane().add(txtChatMembers);
+		frame.getContentPane().add(scroll);
 
 		
 		JLabel lblOutput = new JLabel("System Output");
@@ -91,7 +96,11 @@ public class CryptoSystem{
 		txtOutput = new JTextArea();
 		txtOutput.setBounds(10, 36, 267, 109);
 		txtOutput.setEditable(false);
+		JScrollPane scroll2 = new JScrollPane(txtOutput);
+	    scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		frame.getContentPane().add(txtOutput);
+		frame.getContentPane().add(scroll2);
+
 	}
 	
 	public void initialize() {		
@@ -102,6 +111,7 @@ public class CryptoSystem{
 			String message;
 			String sender;
 			String wrongCipher = "Your cipher needs to match that of the receiver, please change the cipher";
+			boolean badCipher = false;
 			while (true) {
 				
 				for (int i = 0; i <= threadCounter; i++) {
@@ -142,18 +152,32 @@ public class CryptoSystem{
 						dest = clients[i].destinations;
 						sender = clients[i].name;
 						for (int j = 0; j < dest.length; j++) {
-							for (int k = 0; k < threadName.length; k++) {
+							System.out.println("Entered first layer");
+							for (int k = 0; k < threadCounter; k++) {
+								System.out.println("Entered second level");
 								if (threadName[k].contains(dest[j])) {
-									if (!(clients[k].cipher.length() > 0) || !(clients[k].cipher.contains(clients[i].cipher))) {
+									if (!(clients[k].cipherEnabled)) {
+										System.out.println("Big bad cipher");
+										clients[k].setIncomingMessage("Please select a cipher", "CryptoSystem");
+										clients[i].setIncomingMessage(("Receiver " + clients[k].name + " has not selected a cipher yet, please wait a minute then send again."), "CryptoSystem");
+										clients[i].alertUser = false;
+										badCipher = true;
+										break;
+									} else if (!(clients[k].cipher.contains(clients[i].cipher))) {
 										System.out.println("Bad cipher");
 										clients[i].setIncomingMessage(("For receiver " + clients[k].name + " " + wrongCipher), "CryptoSystem");
+										clients[i].alertUser = false;
+										badCipher = true;
 										break;
 									}
 									System.out.println("Good cipher");
 									clients[k].setIncomingMessage(decryptedString, sender);
+									clients[i].alertUser = false;
 									txtOutput.append("Message sent from " + sender + " to " + threadName[k] + "\n");
 								}
 							}
+							if (badCipher)
+								break;
 						}
 					} else if (clients[i].alertAttackerGuess) { //Means attacker has made a guess, the guess will then be checked and compared to what it should be
 						int victimCounter = 0;
@@ -199,6 +223,7 @@ public class CryptoSystem{
 							clients[i].setIncomingMessage("You have failed to break through the cipher, please try again!", "CryptoSystem");
 							txtOutput.append("Attacker Guess Failed. " + threadName[victimCounter] + " is still safe from " + threadName[threadCounter] + "\n");
 						}
+						clients[i].alertAttackerGuess = false;
 					} else if (clients[i].alertAttackerOracle) { //Means attacker is making an oracle request for info, send the appropriate data
 						int victimCounter = 0;
 						for (victimCounter = 0; victimCounter < threadName.length; victimCounter++) {
@@ -374,6 +399,7 @@ public class CryptoSystem{
 							}
 							txtOutput.append("Attacker has gotten information from the oracle of the type Ciphertext Only\n");
 						}
+						clients[i].alertAttackerOracle = false;
 					} 
 				}
 				try {

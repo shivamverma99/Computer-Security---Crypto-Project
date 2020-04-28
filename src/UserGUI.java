@@ -15,7 +15,9 @@ import java.util.concurrent.TimeUnit;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.Timer;
 import javax.swing.JComboBox;
 import javax.crypto.Cipher;
@@ -136,15 +138,22 @@ public class UserGUI{ //extends Client implements ActionListener{
 		textArea_1.setLineWrap(true);
 		textArea_1.setWrapStyleWord(true);
 		textArea_1.setBounds(10, 220, 420, 163);
+		JScrollPane scroll = new JScrollPane(textArea_1);
+	    scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		frame.getContentPane().add(textArea_1);
+		frame.getContentPane().add(scroll);
+
 		
 		JTextArea textArea_2 = new JTextArea();
 		textArea_2.setWrapStyleWord(true);
 		textArea_2.setLineWrap(true);
 		textArea_2.setEditable(false);
+		JScrollPane scroll2 = new JScrollPane(textArea_2);
+	    scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		textArea_2.setBounds(10, 419, 420, 163);
 		
 		frame.getContentPane().add(textArea_2);
+		frame.getContentPane().add(scroll2);
 		
 		textField_2 = new JTextField();
 		textField_2.setBounds(68, 139, 150, 20);
