@@ -49,7 +49,6 @@ class ServerThread extends Thread{
 				while (!quit) {
 					if (userType.contains("User")) {  //If a user is connected
 						String fullMessage = br.readLine();
-						
 						dataType = fullMessage.substring(0, fullMessage.indexOf(','));
 						fullMessage = fullMessage.substring(fullMessage.indexOf(',') + 1);
 						if (dataType.contains("Cipher")) { //Depending on which cipher it is, will get the key then 
@@ -87,6 +86,10 @@ class ServerThread extends Thread{
 								continue;
 							}
 						} else if (dataType.contains("Message")) { //If user is trying to send a message
+							if (!(cipher.length() > 0)) {
+								pwSock.println("Please pick a cipher first");
+								continue;
+							}
 							sender = fullMessage.substring(0, fullMessage.indexOf(',')); //Record name of sender
 							fullMessage = fullMessage.substring(fullMessage.indexOf(',') + 1);	
 							if (cipher == "Hill Cipher") { //Key for hill cipher depends on message being sent, so get key now
@@ -101,11 +104,10 @@ class ServerThread extends Thread{
 								fullMessage = fullMessage.substring(fullMessage.indexOf(',') + 1);
 							}
 							message = fullMessage;
-							pwSock.println("Message has been received and is on its way");
+							pwSock.println("Message has been received by the system and is on its way");
 							cipherText[messageCounter] = message;
 							messageCounter++;
 							alertUser = true;
-							System.out.println("alert has been set");
 							continue;
 							
 							} else if (dataType == "Quit") {

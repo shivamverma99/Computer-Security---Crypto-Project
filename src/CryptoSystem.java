@@ -38,7 +38,8 @@ public class CryptoSystem{
 	static int threadCounter = -1;
 	static String[] threadName = new String[10];
 	static int nameCounter = 0, temp = 1;
-	static byte[] decrypted, decryptedGuess, decryptedOracle, encryptedOracle;
+	static byte[] decryptedBytes, decryptedGuess, decryptedOracle, encryptedOracle;
+	static String decryptedString;
 	private JFrame frame;
 	
 	JTextArea txtChatMembers;
@@ -105,48 +106,51 @@ public class CryptoSystem{
 				
 				for (int i = 0; i <= threadCounter; i++) {
 					if (clients[i].alertUser) { //This means user is trying to send a message to another user, the message will be decrypted and sent
-						System.out.println("User trying to send message");
 						message = clients[i].message;
 						if (clients[i].cipher.contains("RSA")) {
-							decrypted = RSA.decrypt(clients[i].key.getBytes(), message.getBytes());
-							clients[i].plainText[clients[i].messageCounter - 1] = decrypted.toString();
+							decryptedBytes = RSA.decrypt(clients[i].key.getBytes(), message.getBytes());
+							decryptedString = decryptedBytes.toString();
+							clients[i].plainText[clients[i].messageCounter - 1] = decryptedString;
 						} else if (clients[i].cipher.contains("Stream Cipher")) {
 							byte[] cipherText = message.getBytes();
 					        Cipher cipher = Cipher.getInstance("CFB");
 					        byte[] decodedKey = Base64.getDecoder().decode(clients[i].key);
 					        SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "CFB");
 					        cipher.init(Cipher.DECRYPT_MODE, secretKey);
-					        decrypted = cipher.doFinal(cipherText);
-							clients[i].plainText[clients[i].messageCounter - 1] = decrypted.toString();
+					        decryptedBytes = cipher.doFinal(cipherText);
+					        decryptedString = decryptedBytes.toString();
+							clients[i].plainText[clients[i].messageCounter - 1] = decryptedString;
 						} else if (clients[i].cipher.contains("Block Cipher")) {
 							byte[] cipherText = message.getBytes();
 					        Cipher cipher = Cipher.getInstance("AES");
 					        byte[] decodedKey = Base64.getDecoder().decode(clients[i].key);
 					        SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");
 					        cipher.init(Cipher.DECRYPT_MODE, secretKey);
-					        decrypted = cipher.doFinal(cipherText);
-							clients[i].plainText[clients[i].messageCounter - 1] = decrypted.toString();
+					        decryptedBytes = cipher.doFinal(cipherText);
+							clients[i].plainText[clients[i].messageCounter - 1] = decryptedString;
 						} else if (clients[i].cipher.contains("Monoalphabetic")) {
-							decrypted = MonoCipher.decrypt(message).getBytes();
-							clients[i].plainText[clients[i].messageCounter - 1] = decrypted.toString();
+							decryptedString = MonoCipher.decrypt(message);
+							clients[i].plainText[clients[i].messageCounter - 1] = decryptedString;
+							System.out.println("did the decrypting");
 						} else if (clients[i].cipher.contains("Vigenere")) {
-							decrypted = VigenereCipher.decrypt(message, clients[i].key).getBytes();
-							clients[i].plainText[clients[i].messageCounter - 1] = decrypted.toString();
+							decryptedString = VigenereCipher.decrypt(message, clients[i].key);
+							clients[i].plainText[clients[i].messageCounter - 1] = decryptedString;
 						} else if (clients[i].cipher.contains("Hill Cipher")) {
-							decrypted = HillCipher.decrypt(clients[i].key, message).getBytes();
-							clients[i].plainText[clients[i].messageCounter - 1] = decrypted.toString();
+							decryptedString = HillCipher.decrypt(clients[i].key, message);
+							clients[i].plainText[clients[i].messageCounter - 1] = decryptedString;
 						}
 						dest = clients[i].destinations;
 						sender = clients[i].name;
 						for (int j = 0; j < dest.length; j++) {
 							for (int k = 0; k < threadName.length; k++) {
 								if (threadName[k].contains(dest[j])) {
-									if (!(clients[k].cipher.equals(clients[i].cipher))) {
+									if (!(clients[k].cipher.length() > 0) || !(clients[k].cipher.contains(clients[i].cipher))) {
+										System.out.println("Bad cipher");
 										clients[i].setIncomingMessage(("For receiver " + clients[k].name + " " + wrongCipher), "CryptoSystem");
-										continue;
+										break;
 									}
-									
-									clients[k].setIncomingMessage(decrypted.toString(), sender);
+									System.out.println("Good cipher");
+									clients[k].setIncomingMessage(decryptedString, sender);
 									txtOutput.append("Message sent from " + sender + " to " + threadName[k] + "\n");
 								}
 							}
@@ -388,6 +392,17 @@ public class CryptoSystem{
 						threadName[threadCounter] = clients[threadCounter].name;
 						txtChatMembers.append(threadName[threadCounter] + ", " + clients[threadCounter].type + "\n");
 
+						if (threadCounter > 0) {
+							for (int i = 0; i <= threadCounter; i++) {
+								if (clients[threadCounter].type != "Attacker" && i != threadCounter)
+									clients[i].setIncomingMessage("New Entrant," + clients[threadCounter].name, "CryptoSystem");
+								if (i == threadCounter) {
+									for (int j = 0; j < threadCounter; j++) {
+										clients[i].setIncomingMessage("Currently in chat," + clients[j].name, "CryptoSystem");
+									}
+								}
+							}
+						}
 						if (clients[threadCounter].type == "Attacker") {
 							if (clients.length == 1) {
 								clients[threadCounter].setIncomingMessage("No one has entered chat yet, please quit and try again later.", "CryptoSystem");

@@ -38,6 +38,7 @@ public class UserGUI{ //extends Client implements ActionListener{
 	String name, vigenereKey;
 	byte[] RSAPriKey, RSAPubKey;
 	SecretKey streamKey, blockKey;
+	boolean connected = false, cipherSelected = false;
 
 	/**
 	 * Launch the application.
@@ -112,8 +113,7 @@ public class UserGUI{ //extends Client implements ActionListener{
 		lblNewLabel_5.setBounds(10, 170, 81, 14);
 		frame.getContentPane().add(lblNewLabel_5);
 		
-		JComboBox comboBox_1 = new JComboBox();
-		comboBox_1.setModel(new DefaultComboBoxModel(new String[] {"Alice", "Bob", "Dan"}));
+		JComboBox<String> comboBox_1 = new JComboBox<String>();
 		comboBox_1.setBounds(84, 167, 82, 22);
 		frame.getContentPane().add(comboBox_1);
 		
@@ -178,6 +178,7 @@ public class UserGUI{ //extends Client implements ActionListener{
 			public void actionPerformed(ActionEvent e) {
 				if (e.getActionCommand().equals("Enable")) {
 					String cipher = (String) comboBox.getSelectedItem();
+					cipherSelected = true;
 					if (cipher.contains("RSA")) {
 						KeyPair pair;;
 						try {
@@ -232,7 +233,7 @@ public class UserGUI{ //extends Client implements ActionListener{
 						try {
 							vigenereKey = getRandomString(7); //Send this key to server
 							pwSock.println("Cipher," + cipher + "," + vigenereKey);
-							String response = "";
+							//String response = "";
 							//response = br.readLine();
 							//textArea_1.append(response + "\n");
 						} catch (Exception e1) {
@@ -281,7 +282,8 @@ public class UserGUI{ //extends Client implements ActionListener{
 									pwSock.println("User," + name);
 									//String response = br.readLine();
 									//textArea_1.append(response + "\n");
-									btnNewButton_2.disable();
+									btnNewButton_2.setEnabled(false);;
+									connected = true;
 									
 									
 									//Client c = new Client(textField_1.getText(), port);
@@ -298,6 +300,114 @@ public class UserGUI{ //extends Client implements ActionListener{
 		JButton btnNewButton_3 = new JButton("Send");
 		btnNewButton_3.setBounds(202, 166, 89, 23);
 		frame.getContentPane().add(btnNewButton_3);
+		//be able to encrypt the message based on the cipher chosen by user
+		btnNewButton_3.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if (cipherSelected) {
+					String plainText = textField_2.getText();
+					String sendTo = (String) comboBox_1.getSelectedItem();
+					plainText = plainText.replaceAll("\\p{Punct}","");
+					
+					if(comboBox.getSelectedItem().equals("RSA"))
+					{
+						try {
+							byte[] plainTextBytes = plainText.getBytes();
+							byte[] encryptedBytes = RSA.encrypt(RSAPubKey, plainTextBytes);
+							String encryptedText = encryptedBytes.toString();			
+							textArea_1.append("Sent (PT: " + plainText + ", CT: " + encryptedText + ") to " + sendTo + "\n");
+							pwSock.println("Message," + name + ",1," + sendTo + "," + encryptedText);
+							//String response = br.readLine();
+							//textArea_1.append(response + "\n");
+						}
+						catch(Exception ex) {
+							ex.printStackTrace();
+						}
+						//calling the RSA class
+						//RSA encrypt = new RSA(textField_2.getText());
+						
+					}
+					else if(comboBox.getSelectedItem().equals("Stream Cipher"))
+					{
+						try {
+					        Cipher cipher = Cipher.getInstance("CFB");
+					        byte[] byteText = plainText.getBytes();
+					        cipher.init(Cipher.ENCRYPT_MODE, streamKey);
+					        byte[] byteCipherText = cipher.doFinal(byteText);
+					        String cText = byteCipherText.toString();
+							textArea_1.append("Sent (PT: " + plainText + ", CT: " + cText + ") to " + sendTo + "\n");
+					        pwSock.println("Message," + name + ",1," + sendTo + "," + cText);
+					        //String response = br.readLine();
+							//textArea_1.append(response + "\n");
+						} catch (Exception ex) {
+							ex.printStackTrace();
+						}
+					}
+					else if(comboBox.getSelectedItem().equals("Block Cipher"))
+					{
+				      
+				        try {
+					        Cipher cipher = Cipher.getInstance("AES");
+					        byte[] byteText = plainText.getBytes();
+					        cipher.init(Cipher.ENCRYPT_MODE, blockKey);
+					        byte[] byteCipherText = cipher.doFinal(byteText);
+					        String cText = byteCipherText.toString();
+							textArea_1.append("Sent (PT: " + plainText + ", CT: " + cText + ") to " + sendTo + "\n");
+					        pwSock.println("Message," + name + ",1," + sendTo + "," + cText);
+					        //String response = br.readLine();
+							//textArea_1.append(response + "\n");
+				        } catch (Exception ex) {
+							ex.printStackTrace();
+						}
+				        
+				    }
+					else if(comboBox.getSelectedItem().equals("Monoalphabetic"))
+					{
+						try {
+							//calling the Monoalphabetic class
+							String cipherText = MonoCipher.encrypt(plainText);
+							textArea_1.append("Sent (PT: " + plainText + ", CT: " + cipherText + ") to " + sendTo + "\n");
+							pwSock.println("Message," + name + ",1," + sendTo + "," +cipherText);
+							//String response = br.readLine();
+							//textArea_1.append(response + "\n");
+						} catch (Exception ex) {
+							ex.printStackTrace();
+						}
+						
+					}
+					else if(comboBox.getSelectedItem().equals("Vigenere"))
+					{
+						try {
+							String cipherText = VigenereCipher.encrypt(plainText, vigenereKey);
+							textArea_1.append("Sent (PT: " + plainText + ", CT: " + cipherText + ") to " + sendTo + "\n");
+							pwSock.println("Message," + name + ",1," + sendTo + ","+ cipherText);
+							//String response = br.readLine();
+							//textArea_1.append(response + "\n");
+							//calling the Vigenere Class
+							//VigenereCipher encrypt = new VigenereCipher(textField_2.getText());
+						} catch (Exception ex) {
+							ex.printStackTrace();
+						}
+					}
+					else if (comboBox.getSelectedItem().equals("Hill Cipher")) {
+						try {
+							String key = getRandomString(plainText.length()^2);
+							String cipherText = HillCipher.encrypt(key, plainText);
+							textArea_1.append("Sent (PT: " + plainText + ", CT: " + cipherText + ") to " + sendTo + "\n");
+							pwSock.println("Message," + name + "," + key + ",1," + sendTo + "," + cipherText);
+							//String response = br.readLine();
+							//textArea_1.append(response + "\n");
+						} catch (Exception ex) {
+							ex.printStackTrace();
+						}
+					}
+				} else {
+				textArea_1.append("Please enable a cipher before sending a message\n");
+			}
+		} 
+	});
+		
 		
 		ActionListener refresh = new ActionListener() {
 
@@ -305,15 +415,25 @@ public class UserGUI{ //extends Client implements ActionListener{
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
 				try {
-					String response = br.readLine();
-					textArea_1.append(response + "\n");
-				} catch (Exception e1) {
+					if (connected && br.ready()) {
+						String response = br.readLine();
+						if (response.contains("New Entrant") || response.contains("Currently in")) {
+							response = response.substring(response.indexOf(',') + 1);
+							comboBox_1.addItem(response);
+						} else {
+							textArea_1.append(response + "\n");
+						}
+					}
 					
-				}
+				} catch (Exception e1) {
+					System.out.println("Error Here" + e1);
 			}
+		}
 			
-		};
+	};
 		Timer st = new Timer(1000, refresh);
+		st.setRepeats(true);
+		st.start();
 		
 		
 
