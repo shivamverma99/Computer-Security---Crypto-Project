@@ -138,9 +138,13 @@ public class CryptoSystem{
 							byte[] cipherText = message.getBytes();
 					        Cipher cipher = Cipher.getInstance("AES");
 					        byte[] decodedKey = Base64.getDecoder().decode(clients[i].key);
+					        System.out.println("Decoded");
 					        SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");
+					        System.out.println("Made secret key");
 					        cipher.init(Cipher.DECRYPT_MODE, secretKey);
+					        System.out.println("Initialized cipher");
 					        decryptedBytes = cipher.doFinal(cipherText);
+					        System.out.println("Decrypted");
 							clients[i].plainText[clients[i].messageCounter - 1] = decryptedString;
 						} else if (clients[i].cipher.contains("Monoalphabetic")) {
 							decryptedString = MonoCipher.decrypt(message);
@@ -178,6 +182,8 @@ public class CryptoSystem{
 								}
 							}
 							if (badCipher)
+								break;
+							if (!clients[i].alertUser)
 								break;
 						}
 					} else if (clients[i].alertAttackerGuess) { //Means attacker has made a guess, the guess will then be checked and compared to what it should be

@@ -52,6 +52,7 @@ class ServerThread extends Thread{
 						dataType = fullMessage.substring(0, fullMessage.indexOf(','));
 						fullMessage = fullMessage.substring(fullMessage.indexOf(',') + 1);
 						if (dataType.contains("Cipher")) { //Depending on which cipher it is, will get the key then 
+							cipherEnabled = true;
 							if (fullMessage.contains("RSA")) {
 								cipher = fullMessage.substring(0, fullMessage.indexOf(','));
 								fullMessage = fullMessage.substring(fullMessage.indexOf(',') + 1);
@@ -92,9 +93,10 @@ class ServerThread extends Thread{
 							}
 							sender = fullMessage.substring(0, fullMessage.indexOf(',')); //Record name of sender
 							fullMessage = fullMessage.substring(fullMessage.indexOf(',') + 1);	
-							if (cipher == "Hill Cipher") { //Key for hill cipher depends on message being sent, so get key now
+							if (cipher.contains("Hill Cipher")) { //Key for hill cipher depends on message being sent, so get key now
 								key = fullMessage.substring(0, fullMessage.indexOf(','));
-								fullMessage = fullMessage.substring(fullMessage.indexOf(',' + 1));
+								fullMessage = fullMessage.substring(fullMessage.indexOf(',') + 1);
+								System.out.println(fullMessage + " fm");
 							}
 							numDest = Integer.parseInt(fullMessage.substring(0, 1)); //How many people user wants to send message to
 							destinations = new String[numDest];
