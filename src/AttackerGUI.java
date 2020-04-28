@@ -151,8 +151,8 @@ public class AttackerGUI {
         serverOutput.setWrapStyleWord(true);
         serverOutput.setLineWrap(true);
         JScrollPane scrollPane1 = new JScrollPane(serverOutput);
-		scrollPane.setBounds(20, 356, 327, 113);
-		frame.getContentPane().add(scrollPane);  
+		scrollPane1.setBounds(20, 356, 327, 113);
+		frame.getContentPane().add(scrollPane1);  
         //frame.getContentPane().add(serverOutput);
 
         JLabel guessLbl = new JLabel("Enter Guess Below: ");
@@ -161,8 +161,8 @@ public class AttackerGUI {
 
         JTextArea guessArea = new JTextArea();
         JScrollPane scrollPane2 = new JScrollPane(textArea);
-		scrollPane.setBounds(20, 500, 327, 113);
-		frame.getContentPane().add(scrollPane);
+		scrollPane2.setBounds(20, 500, 327, 113);
+		frame.getContentPane().add(scrollPane2);
         //frame.getContentPane().add(guessArea);
 
         JButton guessButton = new JButton("Guess");
