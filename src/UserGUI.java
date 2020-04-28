@@ -41,6 +41,7 @@ public class UserGUI{ //extends Client implements ActionListener{
 	byte[] RSAPriKey, RSAPubKey;
 	SecretKey streamKey, blockKey;
 	boolean connected = false, cipherSelected = false;
+	private JTextField textField_4;
 
 	/**
 	 * Launch the application.
@@ -130,30 +131,39 @@ public class UserGUI{ //extends Client implements ActionListener{
 		frame.getContentPane().add(lblNewLabel_7);
 		
 		JLabel lblNewLabel_8 = new JLabel("System Messages: ");
-		lblNewLabel_8.setBounds(10, 394, 108, 14);
+		lblNewLabel_8.setBounds(10, 394, 125, 14);
 		frame.getContentPane().add(lblNewLabel_8);
 		
 		JTextArea textArea_1 = new JTextArea();
 		textArea_1.setEditable(false);
 		textArea_1.setLineWrap(true);
 		textArea_1.setWrapStyleWord(true);
-		textArea_1.setBounds(10, 220, 420, 163);
-		JScrollPane scroll = new JScrollPane(textArea_1);
-	    scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		frame.getContentPane().add(textArea_1);
-		frame.getContentPane().add(scroll);
+		//textArea_1.setBounds(10, 220, 420, 163);
+		//JScrollPane scroll = new JScrollPane(textArea_1);
+	    //scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		//frame.getContentPane().add(textArea_1);
+		//frame.getContentPane().add(scroll);
 
 		
 		JTextArea textArea_2 = new JTextArea();
 		textArea_2.setWrapStyleWord(true);
 		textArea_2.setLineWrap(true);
 		textArea_2.setEditable(false);
-		JScrollPane scroll2 = new JScrollPane(textArea_2);
-	    scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		textArea_2.setBounds(10, 419, 420, 163);
+		//JScrollPane scroll2 = new JScrollPane(textArea_2);
+	    //scroll2.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		//textArea_2.setBounds(10, 419, 420, 163);
+		//frame.getContentPane().add(textArea_2);
+
 		
-		frame.getContentPane().add(textArea_2);
-		frame.getContentPane().add(scroll2);
+		JScrollPane scrollPane = new JScrollPane(textArea_1);
+		scrollPane.setBounds(10, 220, 420, 163);
+		frame.getContentPane().add(scrollPane);
+		
+		JScrollPane scrollPane_1 = new JScrollPane(textArea_2);
+		scrollPane_1.setBounds(10, 419, 420, 163);
+		frame.getContentPane().add(scrollPane_1);
+		
+		//frame.getContentPane().add(scroll2);
 		
 		textField_2 = new JTextField();
 		textField_2.setBounds(68, 139, 150, 20);
@@ -178,6 +188,12 @@ public class UserGUI{ //extends Client implements ActionListener{
 		comboBox.setBounds(145, 98, 139, 22);
 		frame.getContentPane().add(comboBox);
 		
+		textField_4 = new JTextField();
+		textField_4.setEditable(false);
+		textField_4.setBounds(369, 139, 86, 20);
+		frame.getContentPane().add(textField_4);
+		textField_4.setColumns(10);
+		
 		
 		JButton btnNewButton = new JButton("Enable");
 		btnNewButton.setBounds(312, 98, 89, 23);
@@ -194,8 +210,9 @@ public class UserGUI{ //extends Client implements ActionListener{
 							pair = RSA.createKeys();
 							RSAPriKey = pair.getPrivate().getEncoded();
 							RSAPubKey = pair.getPublic().getEncoded();
-							String privateKey = RSAPriKey.toString();
+							String privateKey = Base64.getEncoder().encodeToString(RSAPriKey);
 							pwSock.println("Cipher," + cipher + "," + privateKey);
+							textField_4.setText(privateKey);
 							//String response = br.readLine();
 							//textArea_1.append(response + "\n");
 						} catch (Exception e1) {
@@ -211,6 +228,7 @@ public class UserGUI{ //extends Client implements ActionListener{
 							streamKey = key.generateKey();
 							String keyString = Base64.getEncoder().encodeToString(streamKey.getEncoded());
 							pwSock.println("Cipher," + cipher + "," + keyString);
+							textField_4.setText(keyString);
 							//String response = br.readLine();
 							//textArea_1.append(response + "\n");
 						} catch (Exception e1) {
@@ -225,6 +243,7 @@ public class UserGUI{ //extends Client implements ActionListener{
 					        blockKey = key.generateKey();
 					        String keyString = Base64.getEncoder().encodeToString(blockKey.getEncoded());
 							pwSock.println("Cipher," + cipher + "," + keyString);
+							textField_4.setText(keyString);
 							//String response = br.readLine();
 							//textArea_1.append(response + "\n");
 						} catch (Exception e1) {
@@ -242,6 +261,7 @@ public class UserGUI{ //extends Client implements ActionListener{
 						try {
 							vigenereKey = getRandomString(7); //Send this key to server
 							pwSock.println("Cipher," + cipher + "," + vigenereKey);
+							textField_4.setText(vigenereKey);
 							//String response = "";
 							//response = br.readLine();
 							//textArea_1.append(response + "\n");
@@ -309,6 +329,14 @@ public class UserGUI{ //extends Client implements ActionListener{
 		JButton btnNewButton_3 = new JButton("Send");
 		btnNewButton_3.setBounds(202, 166, 89, 23);
 		frame.getContentPane().add(btnNewButton_3);
+		
+		JLabel lblKey = new JLabel("Key");
+		lblKey.setBounds(334, 142, 36, 14);
+		frame.getContentPane().add(lblKey);
+		
+		
+		
+		
 		//be able to encrypt the message based on the cipher chosen by user
 		btnNewButton_3.addActionListener(new ActionListener()
 		{
@@ -405,6 +433,7 @@ public class UserGUI{ //extends Client implements ActionListener{
 							String cipherText = HillCipher.encrypt(key, plainText);
 							textArea_1.append("Sent (PT: " + plainText + ", CT: " + cipherText + ") to " + sendTo + "\n");
 							pwSock.println("Message," + name + "," + key + ",1," + sendTo + "," + cipherText);
+							textField_4.setText(key);
 							//String response = br.readLine();
 							//textArea_1.append(response + "\n");
 						} catch (Exception ex) {

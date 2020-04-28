@@ -80,12 +80,10 @@ public class CryptoSystem{
 
 		
 		txtChatMembers = new JTextArea();
-		txtChatMembers.setBounds(10, 192, 110, 109);
+		//txtChatMembers.setBounds(10, 192, 110, 109);
 		txtChatMembers.setEditable(false);
-		JScrollPane scroll = new JScrollPane(txtChatMembers);
-	    scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		frame.getContentPane().add(txtChatMembers);
-		frame.getContentPane().add(scroll);
+		
+		//frame.getContentPane().add(txtChatMembers);
 
 		
 		JLabel lblOutput = new JLabel("System Output");
@@ -94,13 +92,17 @@ public class CryptoSystem{
 
 		
 		txtOutput = new JTextArea();
-		txtOutput.setBounds(10, 36, 267, 109);
+		//txtOutput.setBounds(10, 36, 267, 109);
 		txtOutput.setEditable(false);
-		JScrollPane scroll2 = new JScrollPane(txtOutput);
-	    scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		frame.getContentPane().add(txtOutput);
-		frame.getContentPane().add(scroll2);
+		//frame.getContentPane().add(txtOutput);
 
+		JScrollPane scrollPane = new JScrollPane(txtChatMembers);
+		scrollPane.setBounds(10, 192, 110, 109);
+		frame.getContentPane().add(scrollPane);
+		
+		JScrollPane scrollPane_1 = new JScrollPane(txtOutput);
+		scrollPane_1.setBounds(10, 36, 267, 109);
+		frame.getContentPane().add(scrollPane_1);
 	}
 	
 	public void initialize() {		
@@ -118,7 +120,9 @@ public class CryptoSystem{
 					if (clients[i].alertUser) { //This means user is trying to send a message to another user, the message will be decrypted and sent
 						message = clients[i].message;
 						if (clients[i].cipher.contains("RSA")) {
-							decryptedBytes = RSA.decrypt(clients[i].key.getBytes(), message.getBytes());
+							System.out.println("At RSA)");
+							decryptedBytes = RSA.decrypt(Base64.getDecoder().decode(clients[i].key), message.getBytes());
+							System.out.println("did decryption");
 							decryptedString = decryptedBytes.toString();
 							clients[i].plainText[clients[i].messageCounter - 1] = decryptedString;
 						} else if (clients[i].cipher.contains("Stream Cipher")) {
@@ -157,20 +161,17 @@ public class CryptoSystem{
 								System.out.println("Entered second level");
 								if (threadName[k].contains(dest[j])) {
 									if (!(clients[k].cipherEnabled)) {
-										System.out.println("Big bad cipher");
 										clients[k].setIncomingMessage("Please select a cipher", "CryptoSystem");
 										clients[i].setIncomingMessage(("Receiver " + clients[k].name + " has not selected a cipher yet, please wait a minute then send again."), "CryptoSystem");
 										clients[i].alertUser = false;
 										badCipher = true;
 										break;
 									} else if (!(clients[k].cipher.contains(clients[i].cipher))) {
-										System.out.println("Bad cipher");
 										clients[i].setIncomingMessage(("For receiver " + clients[k].name + " " + wrongCipher), "CryptoSystem");
 										clients[i].alertUser = false;
 										badCipher = true;
 										break;
 									}
-									System.out.println("Good cipher");
 									clients[k].setIncomingMessage(decryptedString, sender);
 									clients[i].alertUser = false;
 									txtOutput.append("Message sent from " + sender + " to " + threadName[k] + "\n");

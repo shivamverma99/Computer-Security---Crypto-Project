@@ -52,7 +52,6 @@ class ServerThread extends Thread{
 						dataType = fullMessage.substring(0, fullMessage.indexOf(','));
 						fullMessage = fullMessage.substring(fullMessage.indexOf(',') + 1);
 						if (dataType.contains("Cipher")) { //Depending on which cipher it is, will get the key then 
-							cipherEnabled = true;
 							if (fullMessage.contains("RSA")) {
 								cipher = fullMessage.substring(0, fullMessage.indexOf(','));
 								fullMessage = fullMessage.substring(fullMessage.indexOf(',') + 1);
