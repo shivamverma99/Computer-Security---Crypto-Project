@@ -161,6 +161,9 @@ public class CryptoSystem{
 						} else if (clients[i].cipher.contains("Hill Cipher")) {
 							decryptedString = HillCipher.decrypt(clients[i].key, message);
 							clients[i].plainText[clients[i].messageCounter - 1] = decryptedString;
+						} else if (clients[i].cipher.contains("Affine Cipher")) {
+							decryptedString = AffineCipher.decrypt(message);
+							clients[i].plainText[clients[i].messageCounter - 1] = decryptedString;
 						}
 						dest = clients[i].destinations;
 						sender = clients[i].name;
@@ -230,6 +233,8 @@ public class CryptoSystem{
 							ptGuess = VigenereCipher.decrypt(ctGuess, clients[victimCounter].key);
 						} else if (clients[victimCounter].cipher.contains("Hill Cipher")) {
 							ptGuess = HillCipher.decrypt(clients[victimCounter].key, ctGuess);
+						} else if (clients[victimCounter].cipher.contains("Affine Cipher")) {
+							ptGuess = AffineCipher.decrypt(ctGuess);
 						}
 						
 						if (ptGuess == clients[i].ptGuess.toUpperCase()) {
@@ -288,6 +293,9 @@ public class CryptoSystem{
 								} else if (clients[victimCounter].cipher.contains("Hill Cipher")) {
 									ptOracle = HillCipher.decrypt(clients[victimCounter].key, ctOracle);
 									clients[i].setIncomingMessage(("The plaintext is: " + ptOracle + " For the requested ciphertext: " + ctOracle), "CryptoSystem");
+								} else if (clients[victimCounter].cipher.contains("Affine Cipher")) {
+									ptOracle = AffineCipher.decrypt(ctOracle);
+									clients[i].setIncomingMessage(("The plaintext is: " + ptOracle + " For the requested ciphertext: " + ctOracle), "CryptoSystem");
 								}
 								txtOutput.append("Attacker has gotten information from the oracle of the type Chosen Plaintext\n");
 								
@@ -330,6 +338,9 @@ public class CryptoSystem{
 									clients[i].setIncomingMessage(("The ciphertext is: " + ctOracle + " For the requested plaintext: " + ptOracle), "CryptoSystem");
 								} else if (clients[victimCounter].cipher.contains("Hill Cipher")) {
 									ctOracle = HillCipher.encrypt(clients[victimCounter].key, ptOracle);
+									clients[i].setIncomingMessage(("The ciphertext is: " + ctOracle + " For the requested plaintext: " + ptOracle), "CryptoSystem");
+								} else if (clients[victimCounter].cipher.contains("Affine Cipher")) {
+									ctOracle = AffineCipher.encrypt(ptOracle);
 									clients[i].setIncomingMessage(("The ciphertext is: " + ctOracle + " For the requested plaintext: " + ptOracle), "CryptoSystem");
 								}
 								txtOutput.append("Attacker has gotten information from the oracle of the type Chosen Ciphertext\n");
@@ -375,6 +386,8 @@ public class CryptoSystem{
 									} else if (clients[victimCounter].cipher.contains("Hill Cipher")) {
 										cts[j] = HillCipher.encrypt(clients[victimCounter].key, ptOracle);
 										clients[i].setIncomingMessage(("The ciphertext is: " + cts[j] + " For the given plaintext: " + ptOracle), "CryptoSystem");
+									} else if (clients[victimCounter].cipher.contains("Affine Cipher")) {
+										cts[j] = AffineCipher.encrypt(ptOracle);
 									}
 								}
 								txtOutput.append("Attacker has gotten information from the oracle of the type Known Plaintext\n");
@@ -420,6 +433,9 @@ public class CryptoSystem{
 										clients[i].setIncomingMessage(("The ciphertext is: " + cts[j]), "CryptoSystem");
 									} else if (clients[victimCounter].cipher.contains("Hill Cipher")) {
 										cts[j] = HillCipher.encrypt(clients[victimCounter].key, ptOracle);
+										clients[i].setIncomingMessage(("The ciphertext is: " + cts[j]), "CryptoSystem");
+									} else if (clients[victimCounter].cipher.contains("Affine Cipher")) {
+										cts[j] = AffineCipher.encrypt(ptOracle);
 										clients[i].setIncomingMessage(("The ciphertext is: " + cts[j]), "CryptoSystem");
 									}
 								}

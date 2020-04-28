@@ -85,6 +85,9 @@ class ServerThread extends Thread{
 								cipher = fullMessage;
 								pwSock.println("Cipher has been registered as " + cipher);
 								continue;
+							} else if (fullMessage.contains("Affine Cipher")) {
+								cipher = fullMessage;
+								pwSock.println("Cipher has been registered as " + cipher); 
 							}
 						} else if (dataType.contains("Message")) { //If user is trying to send a message
 							if (!(cipher.length() > 0)) {

@@ -444,6 +444,7 @@ public class UserGUI{ //extends Client implements ActionListener{
 					} else if (comboBox.getSelectedItem().equals("Affine Cipher")) {
 						String cipherText = AffineCipher.encrypt(plainText);
 						textArea_1.append("Sent (PT: " + plainText + ", CT: " + cipherText + ") to " + sendTo + "\n");
+						pwSock.println("Message," + name + ",1," + sendTo + "," + cipherText);
 					}
 				} else {
 				textArea_1.append("Please enable a cipher before sending a message\n");
