@@ -20,7 +20,7 @@ public class BlockCipher {
         //This is the decrypt method for block
         byte[] cipherText = Files.readAllBytes(Paths.get(encryptedFile));
         cipher.init(Cipher.DECRYPT_MODE, secretKey);
-        byte[] bytePlainText = aesCipher.doFinal(cipherText);
+        byte[] bytePlainText = cipher.doFinal(cipherText);
         String plainText = bytePlainText.toString();
     }
 }

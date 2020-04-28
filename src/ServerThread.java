@@ -6,11 +6,11 @@ class ServerThread extends Thread{
 	Socket sock;
 	PrintWriter pwSock; //For the socket I/O
 	BufferedReader br;
-	String userNameAndType;
-	boolean alertUser, alertAttacker;
-	String sender, name, dataType, message, cipher, tool, mode, ptGuess, ctGuess, conversation, key;
-	String[] destinations, victims, cipherText, plainText;
-	int numDest, messageCounter = 0;
+	String name;
+	boolean alertUser, alertAttackerGuess, alertAttackerOracle, abort;
+	String sender, type, dataType, message, cipher, tool, mode, ptGuess, ctGuess, victim, conversation, key, oraclePT, oracleCT;
+	String[] destinations, cipherText, plainText;
+	int numDest, messageCounter = 0, guessCounter = -1;
 	String incomingMessage, incomingSource;
 	
 	//Sets up the socket, print writer, and the buffered reader
@@ -35,20 +35,21 @@ class ServerThread extends Thread{
 			e1.printStackTrace();
 		}
 		String userType = intro.substring(0, intro.indexOf(','));
+		type = userType;
 		intro = intro.substring(intro.indexOf(',') + 1);
 		String userName = intro;
-		userNameAndType = userName + ',' + userType;
+		name = userName;
 		pwSock.println("Hello, " + userName + ". Welcome to the chat.");
 		boolean quit = false, modeBool = false, toolBool = false, convBool = false;
 		
 		
 			try {
 				while (!quit) {
-					if (userType == "User") {
+					if (userType == "User") {  //If a user is connected
 						String fullMessage = br.readLine();
 						dataType = fullMessage.substring(0, fullMessage.indexOf(','));
 						fullMessage = fullMessage.substring(fullMessage.indexOf(',') + 1);
-						if (dataType == "Cipher") {
+						if (dataType == "Cipher") { //Depending on which cipher it is, will get the key then 
 							if (fullMessage.contains("RSA")) {
 								cipher = fullMessage.substring(0, fullMessage.indexOf(','));
 								fullMessage = fullMessage.substring(fullMessage.indexOf(',') + 1);
@@ -76,19 +77,14 @@ class ServerThread extends Thread{
 								cipher = fullMessage;
 								pwSock.println("Cipher has been registered as " + cipher);
 							}
-							
-							
-							continue;
-						} else if (dataType == "Message") {
-							sender = fullMessage.substring(0, fullMessage.indexOf(','));
-							fullMessage = fullMessage.substring(fullMessage.indexOf(',') + 1);
-							name = fullMessage.substring(0, fullMessage.indexOf(','));
+						} else if (dataType == "Message") { //If user is trying to send a message
+							sender = fullMessage.substring(0, fullMessage.indexOf(',')); //Record name of sender
 							fullMessage = fullMessage.substring(fullMessage.indexOf(',') + 1);	
-							if (cipher == "Hill Cipher") {
+							if (cipher == "Hill Cipher") { //Key for hill cipher depends on message being sent, so get key now
 								key = fullMessage.substring(0, fullMessage.indexOf(','));
 								fullMessage = fullMessage.substring(fullMessage.indexOf(',' + 1));
 							}
-							numDest = Integer.parseInt(fullMessage.substring(0, 1));
+							numDest = Integer.parseInt(fullMessage.substring(0, 1)); //How many people user wants to send message to
 							destinations = new String[numDest];
 							fullMessage = fullMessage.substring(fullMessage.indexOf(',') + 1);
 							for (int i = 0; i < numDest; i++) {
@@ -104,42 +100,61 @@ class ServerThread extends Thread{
 							quit = true;
 							continue;
 						}
-						
+						if (abort == true) {
+							sock.close();
+						}
 						if (sock.isClosed()) {
 							quit = true;
 						}	
 					
-					} else if (userType == "Attacker") {
+					} else if (userType == "Attacker") { //If the user is an attacker
 						String fullMessage = br.readLine();
 						dataType = fullMessage.substring(0, fullMessage.indexOf(','));
 						fullMessage = fullMessage.substring(fullMessage.indexOf(',') + 1);
-						if (dataType == "Mode" && !modeBool) {
+						if (dataType == "Mode" && !modeBool) { //If attacker is trying to set the mode of attack
 							mode = fullMessage;
 							modeBool = true;
 							pwSock.println("Attack Mode has been registered as " + mode);
+							if (mode == "Known Plaintext") { //Alert the system to send over the list of plaintexts/ciphertexts
+								alertAttackerOracle = true;
+							} else if (mode == "Ciphertext Only") { //Alert the system to send over the list of ciphertexts
+								alertAttackerOracle = true;
+							}
 							continue;
 						} else if (dataType == "Mode" && modeBool) {
 							pwSock.println("Attack Mode has already been chosen, cannot change now.");
 							continue;
-						} else if (dataType == "Tool" && !toolBool) {
+						} else if (dataType == "Tool" && !toolBool) { //If attacker is trying to select an attack tool
 							tool = fullMessage;
 							toolBool = true;
 						} else if (dataType == "Tool" && toolBool) {
 							pwSock.println("Toolkit has already been selected, cannot change now.");
 							continue;
-						} else if (dataType == "Conversation" && !convBool) {
-							victims = new String[2];
-							victims[0] = fullMessage.substring(0, fullMessage.indexOf(','));
-							fullMessage = fullMessage.substring(fullMessage.indexOf(',') + 1);
-							victims[1] = fullMessage;
+						} else if (dataType == "Conversation" && !convBool) { //If attacker is trying to select who to listen to
+							victim = fullMessage;
 						} else if (dataType == "Conversation" && convBool) {
 							pwSock.println("Cannot listen to a different conversation now.");
 							continue;
-						} else if (dataType == "Guess") {
+						} else if (dataType == "Oracle") { //If attacker wants to make an oracle request
+							if (mode == "Chosen Plaintext") {
+								oraclePT = fullMessage;
+								alertAttackerOracle = true;
+							} else if (mode == "Chosen Ciphertext") {
+								oracleCT = fullMessage;
+								alertAttackerOracle = true;
+							} 
+						
+						} else if (dataType == "Guess") { //If attacker wants to make a guess
+							if (guessCounter == 30) { //Give attacker a max of 30 guesses
+								pwSock.println("You have tried guessing too many times. Goodbye!");
+								sock.close();
+								break;
+							}
 							ctGuess = fullMessage.substring(0, fullMessage.indexOf(','));
 							fullMessage = fullMessage.substring(fullMessage.indexOf(',') + 1);
 							ptGuess = fullMessage;
-							alertAttacker = true;
+							guessCounter++;
+							alertAttackerGuess = true;
 						} else if (dataType == "Quit") {
 							quit = true;
 							continue;
@@ -152,7 +167,8 @@ class ServerThread extends Thread{
 			} catch (Exception e) {
 				System.out.println("ServerThread Exception: " + e);
 		}
-		
+		if (sock.isClosed())
+			System.exit(0);
 		pwSock.println("Good Bye!");
 		System.out.println("Connection Closed. Port: " + sock.getPort());
 		try {
