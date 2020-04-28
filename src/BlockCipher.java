@@ -4,7 +4,7 @@ import javax.crypto.*;
 
 public class BlockCipher {
 
-    public static void main(String[] args) throws Exception {
+    /*public static void main(String[] args) throws Exception {
         
          //This is the encrypt method for block. To change this method to a stream cipher mode, just change the "AES" to "CFB"
         KeyGenerator key = KeyGenerator.getInstance("AES"); 
@@ -22,5 +22,5 @@ public class BlockCipher {
         cipher.init(Cipher.DECRYPT_MODE, secretKey);
         byte[] bytePlainText = cipher.doFinal(cipherText);
         String plainText = bytePlainText.toString();
-    }
+    }*/
 }
