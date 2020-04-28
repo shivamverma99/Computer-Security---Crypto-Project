@@ -26,7 +26,7 @@ public class RSA {
 		return cipherText;
 	}
 	public static byte[] decrypt(byte[] privateKey, byte[] cipherText) throws Exception{
-		PrivateKey newKey = KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(privateKey));
+		PrivateKey newKey = KeyFactory.getInstance("RSA/ECB/NoPadding").generatePrivate(new PKCS8EncodedKeySpec(privateKey));
 		Cipher c = Cipher.getInstance("RSA");
 		c.init(Cipher.DECRYPT_MODE, newKey);
 		byte[] plainText = c.doFinal(cipherText);
