@@ -2,7 +2,7 @@
 import Jama.Matrix;
 public class HillCipher {
 	
-	static void getKeyMatrix(String key, int matrixKey[][]) {
+	static void getKaeyMatrix(String key, int matrixKey[][]) {
 		int x = 0;
 		for(int y = 0; y < matrixKey.length; y++) {
 			for(int z = 0; z < matrixKey[y].length; z++) {
