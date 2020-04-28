@@ -193,7 +193,7 @@ public class Attacker {
 	 * Toolkit Frequency Analysis
 	 * @return the analysis of letters
 	 */
-	public static void frequencyAnalysis() {
+	public static String frequencyAnalysis() {
 		String returnString = "";
 		try {
 			InetAddress inetAddress = InetAddress.getLocalHost();
@@ -246,11 +246,11 @@ public class Attacker {
        		 }
 		
 		//PRINT LETTERS AND CORRESPONDING CIPHER VALUE
-		
+		String s = "";
 		for (i = 0; i < 26; i++) {
-			System.out.println(freqCipher[i] + " = " + freqChar[i]);
+			s += freqCipher[i] + " = " + freqChar[i] + "||";
 		}
-		
+		return s;
 	}
 	
 	/*public static void main(String[] args) {	
