@@ -1,5 +1,5 @@
 //Cipher only works with upper case plainText and Key
-public class VignereCipher {
+public class VigenereCipher {
 	public static void main(String args[]) {
 		String plainText = "Test plaintext";
 		String key = "KEY";
