@@ -9,6 +9,8 @@ import javax.swing.JTextField;
 import java.awt.GridLayout;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JTextArea;
@@ -86,6 +88,7 @@ public class AttackerGUI {
 		
 		JComboBox comboBox = new JComboBox();
 		comboBox.setModel(new DefaultComboBoxModel(new String[] {"Ciphertext-Only:", "Known-Plaintext: ", "Chosen-Ciphertext", "Chosen-Plaintext: "}));
+		comboBox.setSelectedIndex(1);
 		comboBox.setToolTipText("dads\r\n");
 		comboBox.setBounds(102, 75, 129, 22);
 		frame.getContentPane().add(comboBox);
@@ -133,7 +136,150 @@ public class AttackerGUI {
 		JTextArea textArea_1 = new JTextArea();
 		textArea_1.setBounds(20, 356, 327, 113);
 		frame.getContentPane().add(textArea_1);
-		
-		
+
+		//TODO: work out spacing between fields and buttons
+		//label for info given by server (such as plaintext received)
+		JLabel serverOutput = new JLabel("");
+		serverOutput.setBounds(20,340,121,14);
+		//
+		JTextField input = new JTextField("User Input: Type in guess or cipher/plain text for attack");
+		input.setBounds(10,380,200,30);
+		input.setEditable(true);
+
+		JButton attackButton = new JButton("Attack");
+		attackButton.setBounds(267, 138, 89, 23);
+		frame.getContentPane().add(attackButton);
+		attackButton.addActionListener(new ActionListener()
+		{ public void actionPerformed(ActionEvent e)
+		{
+			if(comboBox.getSelectedItem().equals("Ciphertext-Only:"))
+			{
+				//simply print out any ciphertext given by server
+				serverOutput.setText(Attacker.ciphertextOnly());
+			}
+			else if(comboBox.getSelectedItem().equals("Known-Plaintext: "))
+			{
+				serverOutput.setText(Attacker.knownPlaintext());
+			}
+			else if(comboBox.getSelectedItem().equals("Chosen-Ciphertext"))
+			{
+				serverOutput.setText(Attacker.chosenCiphertext(input.getText()));
+			}
+			else if(comboBox.getSelectedItem().equals("Chosen-Plaintext: "))
+			{
+				serverOutput.setText(Attacker.chosenPlaintext(input.getText()));
+			}
+		}});
+		JButton guessButton = new JButton("Guess");
+		attackButton.setBounds(350, 138, 89, 23);
+		frame.getContentPane().add(guessButton);
+		guessButton.addActionListener(new ActionListener()
+		{ public void actionPerformed(ActionEvent e)
+		{
+			serverOutput.setText(Attacker.guess(input.getText()));
+		}});
+
+
+
+	/*public static void main(String[] args) {
+
+		String attackType = "";
+		String attackInputs = "";
+
+		System.out.println("Please choose the attack you want to use.\nInput 1, 2, 3, 4, or quit.\nYou can go back at any time by typing 'BACK'");
+		System.out.print("1. Cipher-Text Only\n2. Known Plain-Text\n3. Chosen Plain-Text\n4. Chosen Cipher-Text\n-> ");
+		Scanner type = new Scanner(System.in);
+		attackType = type.nextLine();
+
+		if (attackType.equals("1")) {
+			while(!attackInputs.equals("QUIT")) {
+				System.out.println("Type 1 to attack, 2 to guess, or QUIT to quit");
+				Scanner input = new Scanner(System.in);
+				attackInputs = input.nextLine();
+				if (attackInputs.equals("1")) {
+					System.out.println(ciphertextOnly());
+					//Ask server for array of cipher-texts
+				}
+				else if (attackInputs.equals("2")) {
+
+					System.out.print("What is Your Guess -> ");
+					input = new Scanner(System.in);
+					attackInputs = input.nextLine();
+					System.out.println(guess(attackInputs));
+					//GUESS ENC/DEC TYPE
+				}
+
+			}
+		}
+		else if (attackType.equals("2")) {
+			while(!attackInputs.equals("QUIT")) {
+				System.out.println("Type 1 to attack, 2 to guess, or QUIT to quit");
+				Scanner input = new Scanner(System.in);
+				attackInputs = input.nextLine();
+				if (attackInputs.equals("1")) {
+					System.out.println(knownPlaintext());
+					//Ask server for array of cipher-texts
+				}
+				else if (attackInputs.equals("2")) {
+
+					System.out.print("What is Your Guess -> ");
+					input = new Scanner(System.in);
+					attackInputs = input.nextLine();
+					System.out.println(guess(attackInputs));
+					//GUESS ENC/DEC TYPE
+				}
+
+			}
+		}
+		else if (attackType.equals("3")) {
+			while(!attackInputs.equals("QUIT")) {
+				System.out.println("Type 1 to attack, 2 to guess, or QUIT to quit");
+				Scanner input = new Scanner(System.in);
+				attackInputs = input.nextLine();
+				if (attackInputs.equals("1")) {
+					System.out.print("Type your plaint-text -> ");
+					input = new Scanner(System.in);
+					attackInputs = input.nextLine();
+					System.out.println(chosenPlaintext(attackInputs));
+					//Input plain-text, and get back cipher-text
+				}
+				else if (attackInputs.equals("2")) {
+
+					System.out.print("What is Your Guess -> ");
+					input = new Scanner(System.in);
+					attackInputs = input.nextLine();
+					System.out.println(guess(attackInputs));
+					//GUESS ENC/DEC TYPE
+				}
+			}
+
+		}
+		else if (attackType.equals("4")) {
+			while(!attackInputs.equals("QUIT")) {
+				System.out.println("Type 1 to attack, 2 to guess, or QUIT to quit");
+				Scanner input = new Scanner(System.in);
+				attackInputs = input.nextLine();
+				if (attackInputs.equals("1")) {
+					System.out.print("Type your cipher-text -> ");
+					input = new Scanner(System.in);
+					attackInputs = input.nextLine();
+					System.out.println(chosenCiphertext(attackInputs));
+					//Input cipher-text, and get back plain-text
+				}
+				else if (attackInputs.equals("2")) {
+
+					System.out.print("What is Your Guess -> ");
+					input = new Scanner(System.in);
+					attackInputs = input.nextLine();
+					System.out.println(guess(attackInputs));
+					//GUESS ENC/DEC TYPE
+				}
+
+			}
+
+		}
+
+		System.out.print("GoodBye");
+	}*/
 	}
 }
