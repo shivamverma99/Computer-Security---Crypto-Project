@@ -1,5 +1,3 @@
-
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -49,7 +47,7 @@ public class Attacker {
 			InetAddress inetAddress = InetAddress.getLocalHost();
 			String IP = inetAddress.getHostAddress();
 			try {
-				returnString = Client(IP, 1234,"Attacker,Mode,Cipher-Text Only");
+				returnString = Client(IP, 5520,"Attacker,Mode,Cipher-Text Only");
 			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -79,7 +77,7 @@ public class Attacker {
 			InetAddress inetAddress = InetAddress.getLocalHost();
 			String IP = inetAddress.getHostAddress();
 			try {
-				returnString = Client(IP, 1234,"Attacker,Mode,Known Plain-Text");
+				returnString = Client(IP, 5520,"Attacker,Mode,Known Plain-Text");
 			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -109,7 +107,7 @@ public class Attacker {
 			InetAddress inetAddress = InetAddress.getLocalHost();
 			String IP = inetAddress.getHostAddress();
 			try {
-				returnString = Client(IP, 1234,"Attacker,Mode,Chosen Cipher-Text," + cipher);
+				returnString = Client(IP, 5520,"Attacker,Mode,Chosen Cipher-Text," + cipher);
 			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -140,7 +138,7 @@ public class Attacker {
 			InetAddress inetAddress = InetAddress.getLocalHost();
 			String IP = inetAddress.getHostAddress();
 			try {
-				returnString = Client(IP, 1234,"Attacker,Mode,Chosen Plaint-Text," + plaintext);
+				returnString = Client(IP, 5520,"Attacker,Mode,Chosen Plaint-Text," + plaintext);
 			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -170,7 +168,7 @@ public class Attacker {
 			InetAddress inetAddress = InetAddress.getLocalHost();
 			String IP = inetAddress.getHostAddress();
 			try {
-				returnString = Client(IP, 1234,"Attacker,Guess,"+myGuess);
+				returnString = Client(IP, 5520,"Attacker,Guess,"+myGuess);
 			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -189,6 +187,10 @@ public class Attacker {
 		return returnString;
 	}
 	
+	public static String bruteforce() {
+		return null;
+	}
+	
 	/**
 	 * Toolkit Frequency Analysis
 	 * @return the analysis of letters
@@ -199,7 +201,7 @@ public class Attacker {
 			InetAddress inetAddress = InetAddress.getLocalHost();
 			String IP = inetAddress.getHostAddress();
 			try {
-				returnString = Client(IP, 1234,"Attacker,Tool,Frequency Analysis");
+				returnString = Client(IP, 5520,"Attacker,Tool,Frequency Analysis");
 			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
