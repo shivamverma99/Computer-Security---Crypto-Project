@@ -184,7 +184,7 @@ public class UserGUI{ //extends Client implements ActionListener{
 		frame.getContentPane().add(lblNewLabel_2);
 		
 		JComboBox comboBox = new JComboBox();
-		comboBox.setModel(new DefaultComboBoxModel(new String[] {"RSA", "Stream Cipher", "Block Cipher", "Monoalphabetic", "Vigenere", "Hill Cipher"}));
+		comboBox.setModel(new DefaultComboBoxModel(new String[] {"RSA", "Stream Cipher", "Block Cipher", "Monoalphabetic", "Vigenere", "Hill Cipher", "Affine Cipher"}));
 		comboBox.setBounds(145, 98, 139, 22);
 		frame.getContentPane().add(comboBox);
 		
@@ -277,6 +277,8 @@ public class UserGUI{ //extends Client implements ActionListener{
 						} catch (Exception e1) {
 							e1.printStackTrace();
 						}
+					} else if (cipher.contains("Affine Cipher")) {
+						pwSock.println("Cipher,Affine Cipher");
 					}
 					
 				}
@@ -439,6 +441,9 @@ public class UserGUI{ //extends Client implements ActionListener{
 						} catch (Exception ex) {
 							ex.printStackTrace();
 						}
+					} else if (comboBox.getSelectedItem().equals("Affine Cipher")) {
+						String cipherText = AffineCipher.encrypt(plainText);
+						textArea_1.append("Sent (PT: " + plainText + ", CT: " + cipherText + ") to " + sendTo + "\n");
 					}
 				} else {
 				textArea_1.append("Please enable a cipher before sending a message\n");
