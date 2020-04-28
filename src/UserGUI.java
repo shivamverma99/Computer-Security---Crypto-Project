@@ -426,10 +426,10 @@ public class UserGUI{ //extends Client implements ActionListener{
 						} catch (Exception ex) {
 							ex.printStackTrace();
 						}
-					}
+					} 
 					else if (comboBox.getSelectedItem().equals("Hill Cipher")) {
 						try {
-							String key = getRandomString(plainText.length()^2);
+							String key = getRandomString(plainText.length() * plainText.length());
 							String cipherText = HillCipher.encrypt(key, plainText);
 							textArea_1.append("Sent (PT: " + plainText + ", CT: " + cipherText + ") to " + sendTo + "\n");
 							pwSock.println("Message," + name + "," + key + ",1," + sendTo + "," + cipherText);

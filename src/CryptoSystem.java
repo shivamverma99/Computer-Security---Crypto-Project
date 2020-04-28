@@ -159,18 +159,22 @@ public class CryptoSystem{
 						}
 						dest = clients[i].destinations;
 						sender = clients[i].name;
-						for (int j = 0; j < dest.length; j++) {
+						for (int j = 0; j < 1; j++) {
 							System.out.println("Entered first layer");
-							for (int k = 0; k < threadCounter; k++) {
+							for (int k = 0; k <= threadCounter; k++) {
+								System.out.println(threadCounter + " tc");
 								System.out.println("Entered second level");
 								if (threadName[k].contains(dest[j])) {
+									System.out.println("found receiver");
 									if (!(clients[k].cipherEnabled)) {
+										System.out.println("Very bad cipher");
 										clients[k].setIncomingMessage("Please select a cipher", "CryptoSystem");
 										clients[i].setIncomingMessage(("Receiver " + clients[k].name + " has not selected a cipher yet, please wait a minute then send again."), "CryptoSystem");
 										clients[i].alertUser = false;
 										badCipher = true;
 										break;
 									} else if (!(clients[k].cipher.contains(clients[i].cipher))) {
+										System.out.println("Bad cipher");
 										clients[i].setIncomingMessage(("For receiver " + clients[k].name + " " + wrongCipher), "CryptoSystem");
 										clients[i].alertUser = false;
 										badCipher = true;
@@ -179,11 +183,13 @@ public class CryptoSystem{
 									clients[k].setIncomingMessage(decryptedString, sender);
 									clients[i].alertUser = false;
 									txtOutput.append("Message sent from " + sender + " to " + threadName[k] + "\n");
+									System.out.println("Good cipher");
+									break;
 								}
 							}
 							if (badCipher)
 								break;
-							if (!clients[i].alertUser)
+							if (!(clients[i].alertUser))
 								break;
 						}
 					} else if (clients[i].alertAttackerGuess) { //Means attacker has made a guess, the guess will then be checked and compared to what it should be

@@ -99,13 +99,16 @@ class ServerThread extends Thread{
 								System.out.println(fullMessage + " fm");
 							}
 							numDest = Integer.parseInt(fullMessage.substring(0, 1)); //How many people user wants to send message to
+							System.out.println(numDest);
 							destinations = new String[numDest];
 							fullMessage = fullMessage.substring(fullMessage.indexOf(',') + 1);
 							for (int i = 0; i < numDest; i++) {
 								destinations[i] = fullMessage.substring(0, fullMessage.indexOf(','));
+								System.out.println(destinations[i]);
 								fullMessage = fullMessage.substring(fullMessage.indexOf(',') + 1);
 							}
 							message = fullMessage;
+							System.out.println(message);
 							pwSock.println("Message has been received by the system and is on its way");
 							cipherText[messageCounter] = message;
 							messageCounter++;
