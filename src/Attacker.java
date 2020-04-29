@@ -332,11 +332,15 @@ public class Attacker {
 		//System.out.print(x);
 		String encMethString = "";
 		//System.out.print("Choose Encryption Method (MonoCipher,VigenereCipher,HillCipher)");
-		while (!encMethString.equals("MonoCipher") || !encMethString.equals("HillCipher") ||!encMethString.equals("VigenereCipher") ){
+		while (true){
 			System.out.print("Choose Encryption Method (MonoCipher,VigenereCipher,HillCipher) -> ");
 			Scanner encMeth = new Scanner(System.in);
 			encMethString = encMeth.nextLine();
+			if (encMethString.equals("MonoCipher") || encMethString.equals("HillCipher") ||encMethString.equals("VigenereCipher")) {
+				break;
+			}
 		}
+	
 		
 		String attackType = "";
 		String attackInputs = "";
