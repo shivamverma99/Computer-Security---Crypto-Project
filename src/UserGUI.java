@@ -30,7 +30,7 @@ import javax.swing.JTextArea;
 public class UserGUI{ //extends Client implements ActionListener{
 
 	private JFrame frame;
-	private JTextField textField;
+	private JTextField txtLocalhost;
 	private JTextField textField_1;
 	private JTextField textField_2;
 	Socket sock;
@@ -94,16 +94,18 @@ public class UserGUI{ //extends Client implements ActionListener{
 		lblNewLabel.setBounds(10, 43, 81, 20);
 		frame.getContentPane().add(lblNewLabel);
 		
-		textField = new JTextField();
-		textField.setBounds(84, 43, 81, 20);
-		frame.getContentPane().add(textField);
-		textField.setColumns(10);
+		txtLocalhost = new JTextField();
+		txtLocalhost.setText("localhost");
+		txtLocalhost.setBounds(84, 43, 81, 20);
+		frame.getContentPane().add(txtLocalhost);
+		txtLocalhost.setColumns(10);
 		
 		JLabel lblNewLabel_1 = new JLabel("System Port: ");
 		lblNewLabel_1.setBounds(10, 74, 81, 17);
 		frame.getContentPane().add(lblNewLabel_1);
 		
 		textField_1 = new JTextField();
+		textField_1.setText("5520");
 		textField_1.setBounds(84, 72, 81, 20);
 		frame.getContentPane().add(textField_1);
 		textField_1.setColumns(10);
@@ -307,7 +309,7 @@ public class UserGUI{ //extends Client implements ActionListener{
 								{
 									name = textField_3.getText();
 									int port = Integer.parseInt(textField_1.getText());
-									sock = new Socket(textField.getText(), port); 
+									sock = new Socket(txtLocalhost.getText(), port); 
 									br = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 									pwSock = new PrintWriter(sock.getOutputStream(), true);
 									pwSock.println("User," + name);
@@ -432,9 +434,13 @@ public class UserGUI{ //extends Client implements ActionListener{
 					else if (comboBox.getSelectedItem().equals("Hill Cipher")) {
 						try {
 							String key = getRandomString(plainText.length() * plainText.length());
-							String cipherText = HillCipher.encrypt(key, plainText);
+							String[] hillData = HillCipher.run(1, plainText, key);
+							String cipherText = hillData[0];
+							String invKey = hillData[1];
 							textArea_1.append("Sent (PT: " + plainText + ", CT: " + cipherText + ") to " + sendTo + "\n");
-							pwSock.println("Message," + name + "," + key + ",1," + sendTo + "," + cipherText);
+							System.out.println(cipherText);
+							System.out.println(invKey);
+							pwSock.println("Message," + name + "," + invKey + ",1," + sendTo + "," + cipherText);
 							textField_4.setText(key);
 							//String response = br.readLine();
 							//textArea_1.append(response + "\n");
