@@ -8,6 +8,8 @@ import java.util.Scanner;
 
 public class Attacker {
 	
+	public static String[] messages = {"Hi there!","My SSN is 123-456-7890","userJC1passwordCHICKENNUGGETS","secretInfo.pdf"};
+	
 	public static String Client(String IP, int port, String data) throws UnknownHostException, IOException, ClassNotFoundException, InterruptedException{
        
         Socket socket = null;
@@ -41,9 +43,9 @@ public class Attacker {
 	 * Attack has a library of cipher-texts, and must figure out the plain-text. 
 	 * @return
 	 */
-	public static String ciphertextOnly() {
+	public static String ciphertextOnly(String method) {
 		String returnString = "";
-		try {
+		/*try {
 			InetAddress inetAddress = InetAddress.getLocalHost();
 			String IP = inetAddress.getHostAddress();
 			try {
@@ -61,8 +63,11 @@ public class Attacker {
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}*/
+		for (int i = 0; i < messages.length; i++) {
+			String s = encrypt(messages[i],method);
+			returnString = returnString + s + "\n";
 		}
-		
 		return returnString;
 	}
 	
@@ -71,9 +76,9 @@ public class Attacker {
 	 * @param
 	 * @return pair
 	 */
-	public static String knownPlaintext() {
+	public static String knownPlaintext(String method) {
 		String returnString = "";
-		try {
+		/*try {
 			InetAddress inetAddress = InetAddress.getLocalHost();
 			String IP = inetAddress.getHostAddress();
 			try {
@@ -91,9 +96,13 @@ public class Attacker {
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}*/
+		for (int i = 0; i < messages.length; i++) {
+			String s = encrypt(messages[i],method);
+			returnString = returnString + s + "=" + messages[i] + "\n";
 		}
-		
 		return returnString;
+		
 	}
 	
 	/**
@@ -101,9 +110,9 @@ public class Attacker {
 	 * @param cipher
 	 * @return plaintext
 	 */
-	public static String chosenCiphertext(String cipher) {
-		String returnString = "";
-		try {
+	public static String chosenCiphertext(String cipher,String method) {
+		
+		/*try {
 			InetAddress inetAddress = InetAddress.getLocalHost();
 			String IP = inetAddress.getHostAddress();
 			try {
@@ -121,9 +130,9 @@ public class Attacker {
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} 
+		} */
 		
-		return returnString;
+		return decrypt(cipher,method);
 	}
 	
 	/**
@@ -132,9 +141,9 @@ public class Attacker {
 	 * @return cipher
 	 *
 	 */
-	public static String chosenPlaintext(String plaintext) {
-		String returnString = "";
-		try {
+	public static String chosenPlaintext(String plaintext,String method) {
+		
+		/*try {
 			InetAddress inetAddress = InetAddress.getLocalHost();
 			String IP = inetAddress.getHostAddress();
 			try {
@@ -152,9 +161,10 @@ public class Attacker {
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} 
+		} */
 		
-		return returnString;
+		
+		return encrypt(plaintext,method);
 	}
 	
 	/**
@@ -162,9 +172,9 @@ public class Attacker {
 	 * @param myGuess
 	 * @return String if guess is correct or not
 	 */
-	public static String guess(String myGuess) {
+	public static String guess(String myGuess,String method) {
 		String returnString = "";
-		try {
+		/*try {
 			InetAddress inetAddress = InetAddress.getLocalHost();
 			String IP = inetAddress.getHostAddress();
 			try {
@@ -182,22 +192,49 @@ public class Attacker {
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} 
-		
+		} */
+		if (method.equals(myGuess)) {
+			returnString = "YOU GOT IT!";
+		} else {
+			returnString = "WRONG, KEEP TRYING";
+		}
 		return returnString;
 	}
 	
-	public static String bruteforce() {
-		return null;
+	/**
+	 * Cracks the plaintext using bruteforce
+	 * @param cipher
+	 * @param plaintext
+	 * @return brute-force plaintext cracked
+	 */
+	public static String bruteforce(String cipher, String method) {
+		int n = cipher.length();
+		String plaintext = decrypt(cipher,method);
+		char[] crack = new char[n];
+		for (int i = 0; i < n; i++) {
+			crack[i] = 65;
+			//System.out.println(crack[i]);
+			while ((crack[i]) != (int)plaintext.charAt(i)) {
+				//System.out.println(crack[i] + " " + plaintext.charAt(i));
+				crack[i] ++;
+			}
+		}
+		String s = new String(crack);
+		return s;
 	}
 	
 	/**
 	 * Toolkit Frequency Analysis
 	 * @return the analysis of letters
 	 */
-	public static String frequencyAnalysis() {
+	public static String frequencyAnalysis(String method) {
 		String returnString = "";
-		try {
+		for (int i = 0; i < messages.length; i++) {
+			String s = encrypt(messages[i],method);
+			returnString = returnString + s;
+		}
+		
+		/*try {
 			InetAddress inetAddress = InetAddress.getLocalHost();
 			String IP = inetAddress.getHostAddress();
 			try {
@@ -215,7 +252,7 @@ public class Attacker {
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 		
 		//ANALYZE LETTERS BY COUNTING THEIR APPEARANCE
 		int[] freqAnalTable = new int[26];
@@ -255,104 +292,180 @@ public class Attacker {
 		return s;
 	}
 	
-	/*public static void main(String[] args) {	
+	/**
+	 * Encrypt using selected enc method
+	 * @param plain
+	 * @param method
+	 * @return Ciphertext
+	 */
+	public static String encrypt(String plain,String method) {
+		if (method.equals("MonoCipher"))
+			return MonoCipher.encrypt(plain);
+		else if (method.equals("VigenereCipher"))
+			return VigenereCipher.encrypt(plain, "LOVE");
+		else if (method.equals("HillCipher"))
+			return HillCipher.encrypt("YKSfKJSfd", plain);
+		else
+			return null;
+	}
+	
+	/**
+	 * Decrypt using selected dec method
+	 * @param cipher
+	 * @param method
+	 * @return Plaintext
+	 */
+	public static String decrypt(String cipher,String method) {
+		if (method.equals("MonoCipher"))
+			return MonoCipher.decrypt(cipher);
+		else if (method.equals("VigenereCipher"))
+			return VigenereCipher.decrypt(cipher, "LOVE");
+		else if (method.equals("HillCipher"))
+			return HillCipher.decrypt("YKSfKJSfd", cipher);
+		else
+			return null;	
+	}
+	
+	public static void main(String[] args) {
+		//char y = 122;
+		//String x = Attacker.bruteforce("Password");
+		//System.out.print(x);
+		String encMethString = "";
+		//System.out.print("Choose Encryption Method (MonoCipher,VigenereCipher,HillCipher)");
+		while (!encMethString.equals("MonoCipher") || !encMethString.equals("HillCipher") ||!encMethString.equals("VigenereCipher") ){
+			System.out.print("Choose Encryption Method (MonoCipher,VigenereCipher,HillCipher) -> ");
+			Scanner encMeth = new Scanner(System.in);
+			encMethString = encMeth.nextLine();
+		}
 		
 		String attackType = "";
 		String attackInputs = "";
 		
-		System.out.println("Please choose the attack you want to use.\nInput 1, 2, 3, 4, or quit.\nYou can go back at any time by typing 'BACK'");
-		System.out.print("1. Cipher-Text Only\n2. Known Plain-Text\n3. Chosen Plain-Text\n4. Chosen Cipher-Text\n-> ");
-		Scanner type = new Scanner(System.in);
-		attackType = type.nextLine();
-		
-		if (attackType.equals("1")) {
-			while(!attackInputs.equals("QUIT")) {
-				System.out.println("Type 1 to attack, 2 to guess, or QUIT to quit");
-				Scanner input = new Scanner(System.in);
-				attackInputs = input.nextLine();
-				if (attackInputs.equals("1")) {
-					System.out.println(ciphertextOnly());
-					//Ask server for array of cipher-texts
-				}
-				else if (attackInputs.equals("2")) {
-					
-					System.out.print("What is Your Guess -> ");
-					input = new Scanner(System.in);
+		while (!attackType.equals("QUIT")) {
+			System.out.println("Please choose the attack you want to use.\nInput 1, 2, 3, 4, or QUIT.");
+			System.out.print(
+					"1. Cipher-Text Only\n2. Known Plain-Text\n3. Chosen Plain-Text\n4. Chosen Cipher-Text\n-> ");
+			Scanner type = new Scanner(System.in);
+			attackType = type.nextLine();
+
+			if (attackType.equals("1")) {
+				while (!attackInputs.equals("QUIT")) {
+					System.out.println(
+							"Type 1 to attack, 2 to guess, 3 for bruteforce, 4 for frequency analysis, or QUIT to quit");
+					Scanner input = new Scanner(System.in);
 					attackInputs = input.nextLine();
-					System.out.println(guess(attackInputs));
-					//GUESS ENC/DEC TYPE
+					if (attackInputs.equals("1")) {
+						System.out.println(ciphertextOnly(encMethString));
+						// Ask server for array of cipher-texts
+					} else if (attackInputs.equals("2")) {
+
+						System.out.print("What is Your Guess -> ");
+						input = new Scanner(System.in);
+						attackInputs = input.nextLine();
+						System.out.println(guess(attackInputs,encMethString));
+						// GUESS ENC/DEC TYPE
+					} else if(attackInputs.equals("3")) {
+						System.out.print("What cipher do you want to crack with brute force -> ");
+						input = new Scanner(System.in);
+						attackInputs = input.nextLine();
+						System.out.println(bruteforce(attackInputs,encMethString));
+					} else if(attackInputs.equals("4")) {
+						String freq = frequencyAnalysis(encMethString);
+						System.out.println(freq);
+					}
+					
+
 				}
-				
+			} else if (attackType.equals("2")) {
+				while (!attackInputs.equals("QUIT")) {
+					System.out.println(
+							"Type 1 to attack, 2 to guess, 3 for bruteforce, 4 for frequency analysis, or QUIT to quit");
+					Scanner input = new Scanner(System.in);
+					attackInputs = input.nextLine();
+					if (attackInputs.equals("1")) {
+						System.out.println(knownPlaintext(encMethString));
+						// Ask server for array of cipher-texts
+					} else if (attackInputs.equals("2")) {
+
+						System.out.print("What is Your Guess -> ");
+						input = new Scanner(System.in);
+						attackInputs = input.nextLine();
+						System.out.println(guess(attackInputs,encMethString));
+						// GUESS ENC/DEC TYPE
+					} else if(attackInputs.equals("3")) {
+						System.out.print("What cipher do you want to crack with brute force -> ");
+						input = new Scanner(System.in);
+						attackInputs = input.nextLine();
+						System.out.println(bruteforce(attackInputs,encMethString));
+					} else if(attackInputs.equals("4")) {
+						String freq = frequencyAnalysis(encMethString);
+						System.out.println(freq);
+					}
+
+				}
+			} else if (attackType.equals("3")) {
+				while (!attackInputs.equals("QUIT")) {
+					System.out.println(
+							"Type 1 to attack, 2 to guess, 3 for bruteforce, 4 for frequency analysis, or QUIT to quit");
+					Scanner input = new Scanner(System.in);
+					attackInputs = input.nextLine();
+					if (attackInputs.equals("1")) {
+						System.out.print("Type your plaint-text -> ");
+						input = new Scanner(System.in);
+						attackInputs = input.nextLine();
+						System.out.println(chosenPlaintext(attackInputs,encMethString));
+						// Input plain-text, and get back cipher-text
+					} else if (attackInputs.equals("2")) {
+
+						System.out.print("What is Your Guess -> ");
+						input = new Scanner(System.in);
+						attackInputs = input.nextLine();
+						System.out.println(guess(attackInputs,encMethString));
+						// GUESS ENC/DEC TYPE
+					} else if(attackInputs.equals("3")) {
+						System.out.print("What cipher do you want to crack with brute force -> ");
+						input = new Scanner(System.in);
+						attackInputs = input.nextLine();
+						System.out.println(bruteforce(attackInputs,encMethString));
+					} else if(attackInputs.equals("4")) {
+						String freq = frequencyAnalysis(encMethString);
+						System.out.println(freq);
+					}
+				}
+
+			} else if (attackType.equals("4")) {
+				while (!attackInputs.equals("QUIT")) {
+					System.out.println(
+							"Type 1 to attack, 2 to guess, 3 for bruteforce, 4 for frequency analysis, or QUIT to quit");
+					Scanner input = new Scanner(System.in);
+					attackInputs = input.nextLine();
+					if (attackInputs.equals("1")) {
+						System.out.print("Type your cipher-text -> ");
+						input = new Scanner(System.in);
+						attackInputs = input.nextLine();
+						System.out.println(chosenCiphertext(attackInputs,encMethString));
+						// Input cipher-text, and get back plain-text
+					} else if (attackInputs.equals("2")) {
+
+						System.out.print("What is Your Guess -> ");
+						input = new Scanner(System.in);
+						attackInputs = input.nextLine();
+						System.out.println(guess(attackInputs,encMethString));
+						// GUESS ENC/DEC TYPE
+					} else if(attackInputs.equals("3")) {
+						System.out.print("What cipher do you want to crack with brute force -> ");
+						input = new Scanner(System.in);
+						attackInputs = input.nextLine();
+						System.out.println(bruteforce(attackInputs,encMethString));
+					} else if(attackInputs.equals("4")) {
+						String freq = frequencyAnalysis(encMethString);
+						System.out.println(freq);
+					}
+
+				}
+
 			}
 		}
-		else if (attackType.equals("2")) {
-			while(!attackInputs.equals("QUIT")) {
-				System.out.println("Type 1 to attack, 2 to guess, or QUIT to quit");
-				Scanner input = new Scanner(System.in);
-				attackInputs = input.nextLine();
-				if (attackInputs.equals("1")) {
-					System.out.println(knownPlaintext());
-					//Ask server for array of cipher-texts
-				}
-				else if (attackInputs.equals("2")) {
-					
-					System.out.print("What is Your Guess -> ");
-					input = new Scanner(System.in);
-					attackInputs = input.nextLine();
-					System.out.println(guess(attackInputs));
-					//GUESS ENC/DEC TYPE
-				}
-				
-			}
-		}
-		else if (attackType.equals("3")) {
-			while(!attackInputs.equals("QUIT")) {
-				System.out.println("Type 1 to attack, 2 to guess, or QUIT to quit");
-				Scanner input = new Scanner(System.in);
-				attackInputs = input.nextLine();
-				if (attackInputs.equals("1")) {
-					System.out.print("Type your plaint-text -> ");
-					input = new Scanner(System.in);
-					attackInputs = input.nextLine();
-					System.out.println(chosenPlaintext(attackInputs));
-					//Input plain-text, and get back cipher-text
-				}
-				else if (attackInputs.equals("2")) {
-					
-					System.out.print("What is Your Guess -> ");
-					input = new Scanner(System.in);
-					attackInputs = input.nextLine();
-					System.out.println(guess(attackInputs));
-					//GUESS ENC/DEC TYPE
-				}
-			}
-			
-		}
-		else if (attackType.equals("4")) {
-			while(!attackInputs.equals("QUIT")) {
-				System.out.println("Type 1 to attack, 2 to guess, or QUIT to quit");
-				Scanner input = new Scanner(System.in);
-				attackInputs = input.nextLine();
-				if (attackInputs.equals("1")) {
-					System.out.print("Type your cipher-text -> ");
-					input = new Scanner(System.in);
-					attackInputs = input.nextLine();
-					System.out.println(chosenCiphertext(attackInputs));
-					//Input cipher-text, and get back plain-text
-				}
-				else if (attackInputs.equals("2")) {
-					
-					System.out.print("What is Your Guess -> ");
-					input = new Scanner(System.in);
-					attackInputs = input.nextLine();
-					System.out.println(guess(attackInputs));
-					//GUESS ENC/DEC TYPE
-				}
-				
-			}
-	
-		}
-		
 		System.out.print("GoodBye");
-	}*/
+	}
 }
